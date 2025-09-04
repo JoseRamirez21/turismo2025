@@ -1,0 +1,139 @@
+:root{
+  --brand: #0d6efd;
+  --brand-dark: #0b5ed7;
+  --bg-soft: #f8f9fa;
+}
+
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
+.navbar-brand img { border-radius: 10px; }
+
+/* HERO */
+.hero {
+  position: relative;
+  min-height: 60vh;
+  background: url('../img/banners/hero.jpg') center/cover no-repeat fixed;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.hero::after{
+  content:'';
+  position:absolute; inset:0; background:rgba(0,0,0,.35);
+}
+.hero .hero-content{
+  position: relative; z-index: 2; text-align: center; max-width: 800px;
+}
+.hero h1{ font-weight: 700; }
+.hero p{ opacity:.95; }
+
+/* Secciones */
+.section-title{ font-weight: 600; }
+
+/* Helpers */
+.object-fit-cover{ object-fit: cover; }
+/* === NAVBAR PROFESIONAL === */
+.bg-dark-custom {
+  background-color: #2b2b2b !important; /* gris oscuro elegante */
+}
+
+/* === NAVBAR COLORIDO Y VIVO === */
+.navbar-custom {
+  background: linear-gradient(90deg, #0066cc, #00b4d8) !important; /* azul → celeste */
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #fff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logo-navbar {
+  width: 55px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.navbar .nav-link {
+  color: #f8f9fa !important;    /* blanco */
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: #ffd60a !important;     /* dorado brillante */
+  border-bottom: 2px solid #ffd60a;
+}
+
+
+
+/* === FOOTER PROFESIONAL TURISMO === */
+.footer-custom {
+  background: #003566; /* azul profundo */
+  color: #ddd;
+}
+
+.text-footer {
+  color: #ffd60a; /* dorado turístico */
+  font-weight: 600;
+}
+
+.footer-link {
+  color: #bbb;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.footer-link:hover {
+  color: #ffd60a; /* hover dorado */
+}
+
+.logo-footer {
+  width: 48px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.footer-social {
+  color: #ccc;
+  font-size: 1.4rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+.footer-social:hover {
+  color: #ffd60a;
+  transform: scale(1.2);
+}
+
+/* === HERO CON IMAGEN DE FONDO === */
+.hero {
+  position: relative;
+  min-height: 60vh; /* altura ajustable */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: url('../img/banners/hero1.jpg') center/cover no-repeat;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45); /* oscurece un poco la imagen */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1; /* asegura que esté encima de la imagen */
+  max-width: 800px;
+}
+
+.hero h1, .hero p {
+  text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+}
+
+
