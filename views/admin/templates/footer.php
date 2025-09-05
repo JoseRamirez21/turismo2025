@@ -1,4 +1,4 @@
-<footer class="bg-dark text-light pt-4 mt-5">
+<footer class="bg-dark text-light pt-4 mt-auto">
   <div class="container">
     <div class="row">
       <!-- Logo y descripción -->

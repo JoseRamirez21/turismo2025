@@ -14,93 +14,71 @@ if (!isset($_SESSION['admin_id'])) {
 $adminNombre = $_SESSION['admin_nombre'] ?? 'Administrador';
 $pageTitle   = "Panel de Control";
 
-// Header + topbar + sidebar
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
 
 <div class="container-fluid">
   <div class="row">
-    <!-- Sidebar (columna izquierda) -->
-    <div class="col-md-3 col-lg-2 bg-dark text-light p-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 text-light p-0">
       <?php require view_path('views/admin/templates/sidebar.php'); ?>
     </div>
 
-    <!-- Contenido principal (columna derecha) -->
+    <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
+
       <!-- Bienvenida -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-primary">👋 Bienvenido, <?= htmlspecialchars($adminNombre) ?></h2>
         <span class="text-muted">Panel de administración</span>
       </div>
 
-      <!-- Tarjetas resumen -->
-      <div class="row g-4">
-        <div class="col-md-3">
-          <div class="card text-white bg-primary shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Departamentos</h5>
-              <p class="card-text small flex-grow-1">Gestiona los departamentos registrados.</p>
-              <a href="<?= BASE_URL ?>/views/admin/departamentos/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
-            </div>
+      <!-- Tarjetas resumen ordenadas -->
+     <!-- Tarjetas resumen ordenadas centradas -->
+<div class="d-flex justify-content-center mb-4">
+  <div class="row g-4" style="max-width:900px;">
+    <?php 
+    $cards = [
+      ['title'=>'Departamentos','text'=>'Gestiona los departamentos registrados.','color'=>'primary','icon'=>'bi-geo-alt','link'=>'departamentos'],
+      ['title'=>'Provincias','text'=>'Relaciona provincias con sus departamentos.','color'=>'success','icon'=>'bi-map','link'=>'provincias'],
+      ['title'=>'Distritos','text'=>'Gestiona distritos vinculados a provincias.','color'=>'warning','icon'=>'bi-building','link'=>'distritos'],
+      ['title'=>'Lugares','text'=>'Administra los lugares turísticos.','color'=>'info','icon'=>'bi-camera','link'=>'lugares'],
+      ['title'=>'Administradores','text'=>'Gestiona los usuarios admin.','color'=>'danger','icon'=>'bi-person-lines-fill','link'=>'admins'],
+    ];
+    foreach($cards as $c): ?>
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm rounded-3 h-100 border-start border-4 border-<?= $c['color'] ?>">
+        <div class="card-body d-flex flex-column align-items-start">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi <?= $c['icon'] ?> fs-3 text-<?= $c['color'] ?> me-2"></i>
+            <h6 class="card-title mb-0"><?= $c['title'] ?></h6>
           </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card text-white bg-success shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Provincias</h5>
-              <p class="card-text small flex-grow-1">Relaciona provincias con sus departamentos.</p>
-              <a href="<?= BASE_URL ?>/views/admin/provincias/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card text-dark bg-warning shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Distritos</h5>
-              <p class="card-text small flex-grow-1">Gestiona distritos vinculados a provincias.</p>
-              <a href="<?= BASE_URL ?>/views/admin/distritos/listar.php" class="btn btn-dark btn-sm mt-auto">Ver más</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card text-white bg-info shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Lugares</h5>
-              <p class="card-text small flex-grow-1">Administra los lugares turísticos.</p>
-              <a href="<?= BASE_URL ?>/views/admin/lugares/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
-            </div>
-          </div>
+          <p class="card-text small flex-grow-1"><?= $c['text'] ?></p>
+          <a href="<?= BASE_URL ?>/views/admin/<?= $c['link'] ?>/listar.php" class="btn btn-<?= $c['color'] ?> btn-sm mt-auto <?= $c['color']=='info'?'text-white':'' ?>">Ver</a>
         </div>
       </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
 
-      <!-- Segunda fila -->
-      <div class="row g-4 mt-2">
-        <div class="col-md-6">
-          <div class="card text-white bg-danger shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Administradores</h5>
-              <p class="card-text small flex-grow-1">Gestiona los usuarios con permisos de administrador.</p>
-              <a href="<?= BASE_URL ?>/views/admin/admins/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
-            </div>
-          </div>
-        </div>
 
-        <div class="col-md-6">
-          <div class="card bg-light shadow rounded-3 h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Estadísticas</h5>
-              <p class="card-text small flex-grow-1">Aquí podrás ver reportes y métricas del sistema.</p>
-              <a href="#" class="btn btn-primary btn-sm mt-auto">Ver más</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Estadísticas más profesional -->
+      
+        
+
     </main>
   </div>
 </div>
 
 <?php require view_path('views/admin/templates/footer.php'); ?>
+
+<!-- Scripts para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  .card-title { font-weight:600; }
+  .card-text { color:#495057; }
+  .border-start { border-left-width:4px !important; }
+</style>
