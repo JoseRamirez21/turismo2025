@@ -20,3 +20,9 @@ require_once __DIR__ . '/../../config/config.php';
   <meta name="description" content="Portal turístico profesional del Perú: departamentos, provincias, distritos y lugares turísticos.">
 </head>
 <body class="bg-light">
+<script>
+  window.APP = {
+    BASE_URL: '<?= rtrim(BASE_URL, "/") ?>',
+    API_BASE_URL: '<?= rtrim(API_BASE_URL, "/") ?>'
+  };
+</script>

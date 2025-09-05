@@ -7,3 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+import { getJSON } from './api.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const data = await getJSON(window.APP.BASE_URL + '/data/departamentos.json');
+    console.log('Departamentos cargados:', data);
+  } catch (err) {
+    console.error('Error cargando departamentos:', err);
+  }
+});

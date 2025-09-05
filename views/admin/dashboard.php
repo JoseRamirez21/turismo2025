@@ -1,57 +1,106 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../models/Lugar.php';
 
-// Iniciar sesión si no está iniciada
-if (session_status() == PHP_SESSION_NONE) session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Validar que el admin haya iniciado sesión
+// Verificar que el admin esté logueado
 if (!isset($_SESSION['admin_id'])) {
-    header("Location: " . BASE_URL . "/views/admin/login.php");
+    header('Location: ' . BASE_URL . '/views/admin/login.php');
     exit;
 }
 
-// Instanciamos modelo de lugares
-$lugarModel = new Lugar();
-$lugares = $lugarModel->getAll(); // Necesitamos agregar un método getAll() en Lugar
+$adminNombre = $_SESSION['admin_nombre'] ?? 'Administrador';
+$pageTitle   = "Panel de Control";
 
-// Header + Navbar
-require view_path('views/templates/header.php');
-require view_path('views/templates/navbar.php');
+// Header + topbar + sidebar
+require view_path('views/admin/templates/header.php');
+require view_path('views/admin/templates/topbar.php');
 ?>
 
-<div class="container py-5">
-    <h1 class="h3 mb-4">Panel de Administración</h1>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar (columna izquierda) -->
+    <div class="col-md-3 col-lg-2 bg-dark text-light p-0">
+      <?php require view_path('views/admin/templates/sidebar.php'); ?>
+    </div>
 
-    <a href="<?= BASE_URL ?>/views/admin/lugares/agregar.php" class="btn btn-success mb-3">+ Agregar lugar</a>
+    <!-- Contenido principal (columna derecha) -->
+    <main class="col-md-9 col-lg-10 px-md-4 py-4">
+      <!-- Bienvenida -->
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2 class="fw-bold text-primary">👋 Bienvenido, <?= htmlspecialchars($adminNombre) ?></h2>
+        <span class="text-muted">Panel de administración</span>
+      </div>
 
-    <table class="table table-striped table-hover shadow-sm">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Distrito</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($lugares as $lugar): ?>
-                <tr>
-                    <td><?= htmlspecialchars($lugar['id_lugar']) ?></td>
-                    <td><?= htmlspecialchars($lugar['nombre']) ?></td>
-                    <td><?= htmlspecialchars($lugar['tipo']) ?></td>
-                    <td><?= htmlspecialchars($lugar['id_distrito']) ?></td>
-                    <td>
-                        <a href="<?= BASE_URL ?>/views/admin/lugares/editar.php?id=<?= $lugar['id_lugar'] ?>" class="btn btn-sm btn-primary">Editar</a>
-                        <a href="<?= BASE_URL ?>/views/admin/lugares/eliminar.php?id=<?= $lugar['id_lugar'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas eliminar este lugar?');">Eliminar</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+      <!-- Tarjetas resumen -->
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="card text-white bg-primary shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Departamentos</h5>
+              <p class="card-text small flex-grow-1">Gestiona los departamentos registrados.</p>
+              <a href="<?= BASE_URL ?>/views/admin/departamentos/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card text-white bg-success shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Provincias</h5>
+              <p class="card-text small flex-grow-1">Relaciona provincias con sus departamentos.</p>
+              <a href="<?= BASE_URL ?>/views/admin/provincias/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card text-dark bg-warning shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Distritos</h5>
+              <p class="card-text small flex-grow-1">Gestiona distritos vinculados a provincias.</p>
+              <a href="<?= BASE_URL ?>/views/admin/distritos/listar.php" class="btn btn-dark btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card text-white bg-info shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Lugares</h5>
+              <p class="card-text small flex-grow-1">Administra los lugares turísticos.</p>
+              <a href="<?= BASE_URL ?>/views/admin/lugares/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila -->
+      <div class="row g-4 mt-2">
+        <div class="col-md-6">
+          <div class="card text-white bg-danger shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Administradores</h5>
+              <p class="card-text small flex-grow-1">Gestiona los usuarios con permisos de administrador.</p>
+              <a href="<?= BASE_URL ?>/views/admin/admins/listar.php" class="btn btn-light btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card bg-light shadow rounded-3 h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Estadísticas</h5>
+              <p class="card-text small flex-grow-1">Aquí podrás ver reportes y métricas del sistema.</p>
+              <a href="#" class="btn btn-primary btn-sm mt-auto">Ver más</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
 
-<?php
-require view_path('views/templates/footer.php');
-?>
+<?php require view_path('views/admin/templates/footer.php'); ?>

@@ -46,7 +46,8 @@
 </footer>
 
 <script src="<?= asset('assets/js/bootstrap.bundle.min.js') ?>"></script>
-<script src="<?= asset('assets/js/main.js') ?>"></script>
-<script src="<?= asset('assets/js/api.js') ?>"></script>
+<script src="<?= asset('assets/js/bootstrap.bundle.min.js') ?>"></script>
+<script type="module" src="<?= asset('assets/js/main.js') ?>"></script>
+
 </body>
 </html>

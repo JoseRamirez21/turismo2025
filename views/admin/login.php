@@ -7,24 +7,26 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 if (isset($_SESSION['admin_id'])) {
-    header('Location: ' . BASE_URL . '/views/admin/dashboard.php');
-    exit;
+   header('Location: dashboard.php');
+exit;
+
 }
 
 $mensaje = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = trim($_POST['usuario'] ?? '');
-    $clave = trim($_POST['clave'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $clave = trim($_POST['password'] ?? '');
 
-    if ($usuario && $clave) {
+    if ($email && $clave) {
         $adminModel = new Admin();
-        $admin = $adminModel->login($usuario, $clave);
+        $admin = $adminModel->login($email, $clave);
 
         if ($admin) {
             $_SESSION['admin_id'] = $admin['id_admin'];
             $_SESSION['admin_nombre'] = $admin['nombre'];
-            header('Location: ' . BASE_URL . '/views/admin/dashboard.php');
-            exit;
+            header('Location: dashboard.php');
+exit;
+
         } else {
             $mensaje = 'Usuario o contraseña incorrectos';
         }
@@ -51,12 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" action="">
             <div class="mb-3">
-                <label for="usuario" class="form-label">Usuario</label>
-                <input type="text" id="usuario" name="usuario" class="form-control rounded-pill" placeholder="Ingresa tu usuario" required>
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" id="email" name="email" class="form-control rounded-pill" placeholder="ejemplo@turismo.com" required>
             </div>
             <div class="mb-3">
-                <label for="clave" class="form-label">Contraseña</label>
-                <input type="password" id="clave" name="clave" class="form-control rounded-pill" placeholder="********" required>
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-control rounded-pill" placeholder="********" required>
             </div>
             <button type="submit" class="btn btn-warning w-100 rounded-pill fw-bold">Iniciar sesión</button>
         </form>

@@ -10,19 +10,22 @@ class Admin {
         $this->pdo = $pdo;
     }
 
-    // Método para iniciar sesión
-    public function login(string $usuario, string $clave): ?array {
-        $stmt = $this->pdo->prepare("SELECT id_admin, nombre, usuario, clave FROM admins WHERE usuario = ?");
-        $stmt->execute([$usuario]);
-        $admin = $stmt->fetch();
+    // Método para iniciar sesión con email y password
+   public function login(string $email, string $clave): ?array {
+    $stmt = $this->pdo->prepare("SELECT id_admin, nombre, email, password FROM admins WHERE email = ?");
+    $stmt->execute([$email]);
+    $admin = $stmt->fetch();
 
-        if ($admin && password_verify($clave, $admin['clave'])) {
-            // Si la contraseña es correcta
-            return $admin;
-        }
-
-        return null; // Usuario o contraseña incorrectos
+    // Debug temporal
+    if (!$admin) {
+        die("⚠️ No se encontró usuario con email: $email");
     }
 
-    // Otros métodos CRUD para administrar los lugares pueden ir aquí
+    if (!password_verify($clave, $admin['password'])) {
+        die("⚠️ Contraseña incorrecta para $email. Hash guardado: {$admin['password']}, ingresada: $clave");
+    }
+
+    return $admin;
+}
+
 }
