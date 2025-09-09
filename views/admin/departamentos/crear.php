@@ -4,18 +4,6 @@ require_once __DIR__ . '/../../../models/Departamento.php';
 
 $departamentoModel = new Departamento();
 
-$id = $_GET['id'] ?? null;
-if (!$id || !is_numeric($id)) {
-    header("Location: listar.php");
-    exit;
-}
-
-$departamento = $departamentoModel->getById((int)$id);
-if (!$departamento) {
-    header("Location: listar.php");
-    exit;
-}
-
 $errors = [];
 $success = null;
 
@@ -28,17 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        if ($departamentoModel->update((int)$id, $nombre)) {
-            $success = "Departamento actualizado correctamente.";
-            header("Location: listar.php?updated=1");
+        if ($departamentoModel->create($nombre)) {
+            $success = "Departamento creado correctamente.";
+            // Redirigir al listar
+            header("Location: listar.php");
             exit;
         } else {
-            $errors[] = "Error al actualizar el departamento.";
+            $errors[] = "Error al guardar el departamento.";
         }
     }
 }
 
-$pageTitle = "Editar Departamento";
+$pageTitle = "Nuevo Departamento";
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
@@ -54,7 +43,7 @@ require view_path('views/admin/templates/topbar.php');
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
       <!-- Encabezado -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-warning">✏️ Editar Departamento</h2>
+        <h2 class="fw-bold text-primary">➕ Nuevo Departamento</h2>
         <a href="listar.php" class="btn btn-secondary btn-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
@@ -82,10 +71,10 @@ require view_path('views/admin/templates/topbar.php');
             <div class="mb-3">
               <label for="nombre" class="form-label fw-bold">Nombre del departamento</label>
               <input type="text" class="form-control" id="nombre" name="nombre" 
-                     value="<?= htmlspecialchars($_POST['nombre'] ?? $departamento['nombre']) ?>" required>
+                     value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" required>
             </div>
-            <button type="submit" class="btn btn-warning">
-              <i class="bi bi-check-circle"></i> Actualizar
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-check-circle"></i> Guardar
             </button>
             <a href="listar.php" class="btn btn-outline-secondary">Cancelar</a>
           </form>
