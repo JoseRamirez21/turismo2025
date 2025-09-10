@@ -10,10 +10,28 @@ class Departamento {
         $this->pdo = $pdo;
     }
 
-    // Obtener todos los departamentos
-    public function getAll(): array {
-        $stmt = $this->pdo->query("SELECT id_departamento, nombre FROM departamentos ORDER BY nombre ASC");
+    // 🔹 Obtener todos los departamentos con búsqueda, límite y offset
+    public function getAll(string $search = '', int $limit = 20, int $offset = 0): array {
+        $sql = "SELECT id_departamento, nombre 
+                FROM departamentos
+                WHERE nombre LIKE :search
+                ORDER BY nombre ASC
+                LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 🔹 Contar departamentos (para paginación y búsqueda)
+    public function count(string $search = ''): int {
+        $sql = "SELECT COUNT(*) FROM departamentos WHERE nombre LIKE :search";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        $stmt->execute();
+        return (int)$stmt->fetchColumn();
     }
 
     // Obtener un departamento por ID
@@ -41,5 +59,5 @@ class Departamento {
         $stmt = $this->pdo->prepare("DELETE FROM departamentos WHERE id_departamento = ?");
         return $stmt->execute([$id_departamento]);
     }
-    
 }
+

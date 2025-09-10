@@ -1,16 +1,16 @@
 <?php
 require_once __DIR__ . '/../../../config/config.php';
-require_once __DIR__ . '/../../../controllers/ProvinciaController.php';
+require_once __DIR__ . '/../../../controllers/AdminController.php';
 
-$controller = new ProvinciaController();
+$controller = new AdminController();
 
-// Valores predeterminados
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+// Parámetros de búsqueda y límite
+$search = $_GET['search'] ?? '';
+$limit = (int)($_GET['limit'] ?? 20);
 
-$provincias = $controller->index($search, $limit);
+$admins = $controller->index($search, $limit);
 
-$pageTitle = "Provincias";
+$pageTitle = "Administradores";
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
@@ -25,9 +25,9 @@ require view_path('views/admin/templates/topbar.php');
     <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
 
-      <!-- Encabezado con búsqueda y botón en una sola fila -->
+      <!-- Encabezado con búsqueda y botón -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-success">🗺️ Provincias</h2>
+        <h2 class="fw-bold text-info">👤 Administradores</h2>
 
         <div class="d-flex align-items-center">
           <!-- Formulario de búsqueda y límite -->
@@ -41,21 +41,20 @@ require view_path('views/admin/templates/topbar.php');
             </select>
 
             <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
-                   class="form-control form-control-sm me-2" placeholder="Buscar por nombre...">
+                   class="form-control form-control-sm me-2" placeholder="Buscar por nombre o email...">
 
             <button type="submit" class="btn btn-sm btn-primary">
               <i class="bi bi-search"></i> Buscar
             </button>
           </form>
 
-          <!-- Botón Nuevo Provincia -->
           <a href="crear.php" class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle"></i> Nueva Provincia
+            <i class="bi bi-plus-circle"></i> Nuevo Admin
           </a>
         </div>
       </div>
 
-      <!-- Tabla de Provincias -->
+      <!-- Tabla -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="table-responsive">
@@ -63,37 +62,37 @@ require view_path('views/admin/templates/topbar.php');
               <thead class="table-dark">
                 <tr>
                   <th>#</th>
-                  <th>Provincia</th>
-                  <th>Departamento</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
                   <th class="text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                <?php if ($provincias): ?>
+                <?php if ($admins): ?>
                   <?php $i = 1; ?>
-                  <?php foreach ($provincias as $p): ?>
+                  <?php foreach ($admins as $a): ?>
                     <tr>
                       <td><?= $i++ ?></td>
-                      <td><?= htmlspecialchars($p['nombre']) ?></td>
-                      <td><?= htmlspecialchars($p['departamento_nombre'] ?? '—') ?></td>
+                      <td><?= htmlspecialchars($a['nombre']) ?></td>
+                      <td><?= htmlspecialchars($a['email']) ?></td>
                       <td class="text-center">
-                        <a href="editar.php?id=<?= $p['id_provincia'] ?>" class="btn btn-warning btn-sm me-1">
+                        <a href="editar.php?id=<?= $a['id_admin'] ?>" class="btn btn-warning btn-sm me-2">
                           <i class="bi bi-pencil-square"></i> Editar
                         </a>
-                        <a href="#"
-                           class="btn btn-danger btn-sm"
-                           data-bs-toggle="modal"
-                           data-bs-target="#deleteModal"
-                           data-id="<?= $p['id_provincia'] ?>"
-                           data-nombre="<?= htmlspecialchars($p['nombre']) ?>">
-                           <i class="bi bi-trash"></i> Eliminar
+                        <a href="#" 
+                           class="btn btn-danger btn-sm" 
+                           data-bs-toggle="modal" 
+                           data-bs-target="#deleteModal" 
+                           data-id="<?= $a['id_admin'] ?>" 
+                           data-nombre="<?= htmlspecialchars($a['nombre']) ?>">
+                          <i class="bi bi-trash"></i> Eliminar
                         </a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="4" class="text-center text-muted">No hay provincias registradas</td>
+                    <td colspan="4" class="text-center text-muted">No hay administradores registrados</td>
                   </tr>
                 <?php endif; ?>
               </tbody>
@@ -115,7 +114,9 @@ require view_path('views/admin/templates/topbar.php');
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
-        <p class="mb-3">¿Seguro que deseas eliminar la provincia <strong id="nombreProvincia"></strong>?</p>
+        <p class="mb-3">
+          ¿Seguro que deseas eliminar el administrador <strong id="nombreAdmin"></strong>?
+        </p>
         <form id="deleteForm" method="POST" action="eliminar.php">
           <input type="hidden" name="id" id="deleteId">
           <button type="submit" class="btn btn-danger">
@@ -137,8 +138,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var button = event.relatedTarget;
     var id = button.getAttribute('data-id');
     var nombre = button.getAttribute('data-nombre');
+
     document.getElementById('deleteId').value = id;
-    document.getElementById('nombreProvincia').textContent = nombre;
+    document.getElementById('nombreAdmin').textContent = nombre;
   });
 });
 </script>

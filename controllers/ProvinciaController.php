@@ -12,44 +12,54 @@ class ProvinciaController {
         $this->departamentoModel = new Departamento();
     }
 
-    // Mostrar todas las provincias
-    public function index(): array {
-    return $this->provinciaModel->getAll();
-}
+    /**
+     * Listar provincias con búsqueda y límite opcional
+     *
+     * @param string $search Texto a buscar por nombre
+     * @param int $limit Cantidad máxima de registros
+     * @return array
+     */
+    public function index(string $search = '', int $limit = 20): array {
+        return $this->provinciaModel->getAll($search, $limit);
+    }
 
+    // Obtener todos los departamentos para poblar select
+    public function getDepartamentos(): array {
+        return $this->departamentoModel->getAll();
+    }
 
     // Crear nueva provincia
-    public function store(string $nombre, int $id_departamento): bool {
+    public function store(array $data): bool {
+        $nombre = $data['nombre'] ?? '';
+        $id_departamento = $data['id_departamento'] ?? 0;
+
         if (empty($nombre) || $id_departamento <= 0) {
             return false;
         }
+
         return $this->provinciaModel->create($nombre, $id_departamento);
     }
 
-    // Obtener datos de una provincia
+    // Obtener una provincia por ID
     public function show(int $id): ?array {
         return $this->provinciaModel->getById($id);
     }
 
-    // Editar provincia
-    public function update(int $id, string $nombre, int $id_departamento): bool {
+    // Actualizar provincia
+    public function update(int $id, array $data): bool {
+        $nombre = $data['nombre'] ?? '';
+        $id_departamento = $data['id_departamento'] ?? 0;
+
         if (empty($nombre) || $id <= 0) {
             return false;
         }
+
         return $this->provinciaModel->update($id, $nombre, $id_departamento);
     }
 
     // Eliminar provincia
     public function delete(int $id): bool {
-        if ($id <= 0) {
-            return false;
-        }
+        if ($id <= 0) return false;
         return $this->provinciaModel->delete($id);
     }
-
-    // Para poblar selects de departamentos en formularios
-    public function getDepartamentos(): array {
-        return $this->departamentoModel->getAll();
-    }
-    
 }

@@ -1,10 +1,14 @@
 <?php
 require_once __DIR__ . '/../../../config/config.php';
-require_once __DIR__ . '/../../../models/Departamento.php';
+require_once __DIR__ . '/../../../controllers/DepartamentoController.php';
 
-$departamentoModel = new Departamento();
-$departamentos = $departamentoModel->getAll();
+$search = $_GET['search'] ?? '';
+$limit  = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+$offset = 0; // puedes usar paginación más adelante
 
+$controller = new DepartamentoController();
+$departamentos = $controller->index($search, $limit, $offset);
+$total = $controller->count($search);
 
 $pageTitle = "Departamentos";
 require view_path('views/admin/templates/header.php');
@@ -20,12 +24,33 @@ require view_path('views/admin/templates/topbar.php');
 
     <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
-      <!-- Encabezado -->
+
+      <!-- Encabezado con búsqueda y límite -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-primary">📍 Departamentos</h2>
-        <a href="crear.php" class="btn btn-success btn-sm">
-          <i class="bi bi-plus-circle"></i> Nuevo
-        </a>
+
+        <div class="d-flex align-items-center">
+          <form method="GET" class="d-flex align-items-center me-2">
+            <label for="limit" class="me-1">Mostrar:</label>
+            <select name="limit" id="limit" class="form-select form-select-sm me-2 w-auto" onchange="this.form.submit()">
+              <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
+              <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+              <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+              <option value="200" <?= $limit == 200 ? 'selected' : '' ?>>200</option>
+            </select>
+
+            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                   class="form-control form-control-sm me-2" placeholder="Buscar por nombre...">
+
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </form>
+
+          <a href="crear.php" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle"></i> Nuevo
+          </a>
+        </div>
       </div>
 
       <!-- Tabla -->
@@ -42,50 +67,23 @@ require view_path('views/admin/templates/topbar.php');
               </thead>
               <tbody>
                 <?php if ($departamentos): ?>
+                  <?php $i = 1; ?>
                   <?php foreach ($departamentos as $d): ?>
                     <tr>
-                      <td><?= htmlspecialchars($d['id_departamento']) ?></td>
+                      <td><?= $i++ ?></td>
                       <td><?= htmlspecialchars($d['nombre']) ?></td>
                       <td class="text-center">
-                      <a href="editar.php?id=<?= $d['id_departamento'] ?>" class="btn btn-warning btn-sm">
-  <i class="bi bi-pencil-square"></i> Editar
-</a>
-
-<a href="#" 
-   class="btn btn-danger btn-sm ms-1" 
-   data-bs-toggle="modal" 
-   data-bs-target="#deleteModal" 
-   data-id="<?= $d['id_departamento'] ?>" 
-   data-nombre="<?= htmlspecialchars($d['nombre']) ?>">
-   <i class="bi bi-trash"></i> Eliminar
-</a>
-
-
-<!-- Modal Eliminar -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content shadow-lg border-0 rounded-3">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar eliminación</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p class="mb-3">
-          ¿Seguro que deseas eliminar el departamento 
-          <strong id="nombreDepartamento"></strong>?
-        </p>
-        <form id="deleteForm" method="POST" action="eliminar.php">
-          <input type="hidden" name="id" id="deleteId">
-          <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Sí, eliminar
-          </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
+                        <a href="editar.php?id=<?= $d['id_departamento'] ?>" class="btn btn-warning btn-sm me-2">
+                          <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                        <a href="#" 
+                           class="btn btn-danger btn-sm"
+                           data-bs-toggle="modal"
+                           data-bs-target="#deleteModal"
+                           data-id="<?= $d['id_departamento'] ?>"
+                           data-nombre="<?= htmlspecialchars($d['nombre']) ?>">
+                           <i class="bi bi-trash"></i> Eliminar
+                        </a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -103,7 +101,31 @@ require view_path('views/admin/templates/topbar.php');
   </div>
 </div>
 
+<!-- Modal Eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">¿Seguro que deseas eliminar el departamento <strong id="nombreDepartamento"></strong>?</p>
+        <form id="deleteForm" method="POST" action="eliminar.php">
+          <input type="hidden" name="id" id="deleteId">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Sí, eliminar
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <?php require view_path('views/admin/templates/footer.php'); ?>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var deleteModal = document.getElementById('deleteModal');
@@ -111,8 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var button = event.relatedTarget;
     var id = button.getAttribute('data-id');
     var nombre = button.getAttribute('data-nombre');
-
-    // Insertar datos en el modal
     document.getElementById('deleteId').value = id;
     document.getElementById('nombreDepartamento').textContent = nombre;
   });

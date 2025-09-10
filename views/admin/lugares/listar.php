@@ -3,7 +3,12 @@ require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../controllers/LugarController.php';
 
 $controller = new LugarController();
-$lugares = $controller->index();
+
+// Valores predeterminados
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+$lugares = $controller->index($limit, $search);
 
 $pageTitle = "Lugares Turísticos";
 require view_path('views/admin/templates/header.php');
@@ -16,14 +21,40 @@ require view_path('views/admin/templates/topbar.php');
       <?php require view_path('views/admin/templates/sidebar.php'); ?>
     </div>
 
+    <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
+
+      <!-- Encabezado con filtro -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-warning">📍 Lugares Turísticos</h2>
-        <a href="crear.php" class="btn btn-success btn-sm">
-          <i class="bi bi-plus-circle"></i> Nuevo Lugar
-        </a>
+        <div class="d-flex align-items-center">
+
+          <!-- Formulario para seleccionar límite y buscar -->
+          <form method="GET" class="d-flex align-items-center me-2">
+            <label for="limit" class="me-1">Mostrar:</label>
+            <select name="limit" id="limit" class="form-select form-select-sm me-2 w-auto" onchange="this.form.submit()">
+              <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
+              <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+              <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+              <option value="200" <?= $limit == 200 ? 'selected' : '' ?>>200</option>
+            </select>
+
+            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                   class="form-control form-control-sm me-2" placeholder="Buscar por nombre...">
+
+            <button type="submit" class="btn btn-sm btn-primary">
+  <i class="bi bi-search"></i> Buscar
+</button>
+
+          </form>
+
+          <a href="crear.php" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle"></i> Nuevo Lugar
+          </a>
+        </div>
       </div>
 
+      <!-- Tabla -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="table-responsive">

@@ -10,16 +10,20 @@ class Provincia {
         $this->pdo = $pdo;
     }
 
-    // 🔹 Obtener todas las provincias con su departamento
-public function getAll(): array {
-    $sql = "SELECT p.id_provincia, p.nombre, d.nombre AS departamento_nombre
-            FROM provincias p
-            INNER JOIN departamentos d ON p.id_departamento = d.id_departamento
-            ORDER BY d.nombre ASC, p.nombre ASC";
-    $stmt = $this->pdo->query($sql);
-    return $stmt->fetchAll();
-}
-
+    // 🔹 Obtener todas las provincias con su departamento, con búsqueda y límite
+    public function getAll(string $search = '', int $limit = 20): array {
+        $sql = "SELECT p.id_provincia, p.nombre, d.nombre AS departamento_nombre
+                FROM provincias p
+                INNER JOIN departamentos d ON p.id_departamento = d.id_departamento
+                WHERE p.nombre LIKE :search
+                ORDER BY d.nombre ASC, p.nombre ASC
+                LIMIT :limit";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
     // 🔹 Obtener provincias por departamento_id
     public function getByDepartamento(int $departamentoId): array {
@@ -56,5 +60,4 @@ public function getAll(): array {
         $stmt = $this->pdo->prepare("DELETE FROM provincias WHERE id_provincia = ?");
         return $stmt->execute([$id_provincia]);
     }
-    
 }

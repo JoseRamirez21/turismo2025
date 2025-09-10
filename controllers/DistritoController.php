@@ -12,9 +12,14 @@ class DistritoController {
         $this->provinciaModel = new Provincia();
     }
 
-    // Listar todos los distritos
-    public function index(): array {
-        return $this->distritoModel->getAll();
+    // Listar distritos con búsqueda, límite y paginación
+    public function index(string $search = '', int $limit = 20, int $offset = 0): array {
+        return $this->distritoModel->getAll($search, $limit, $offset);
+    }
+
+    // Contar distritos (para paginación)
+    public function count(string $search = ''): int {
+        return $this->distritoModel->count($search);
     }
 
     // Mostrar formulario de creación

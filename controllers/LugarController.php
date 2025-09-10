@@ -9,9 +9,9 @@ class LugarController {
         $this->model = new Lugar();
     }
 
-    // 🔹 Listar todos los lugares
-    public function index(): array {
-        return $this->model->getAll();
+    // 🔹 Listar con límite y búsqueda
+    public function index($limit = 20, $search = ''): array {
+        return $this->model->getAll($limit, $search);
     }
 
     // 🔹 Obtener lugares por distrito
@@ -39,3 +39,4 @@ class LugarController {
         return $this->model->delete($id);
     }
 }
+

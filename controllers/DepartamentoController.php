@@ -9,41 +9,36 @@ class DepartamentoController {
         $this->model = new Departamento();
     }
 
-    // Listar todos
-    public function index() {
-        return $this->model->getAll();
+    // Listar departamentos con búsqueda y límite
+    public function index(string $search = '', int $limit = 20, int $offset = 0): array {
+        return $this->model->getAll($search, $limit, $offset);
     }
 
-    // Ver detalle de un departamento
-    public function show($id) {
+    // Contar departamentos (para paginación)
+    public function count(string $search = ''): int {
+        return $this->model->count($search);
+    }
+
+    // Obtener un departamento
+    public function show(int $id): ?array {
         return $this->model->getById($id);
     }
 
-    // Crear nuevo
-    public function store($data) {
-        $nombre = trim($data['nombre'] ?? '');
-        if ($nombre === '') {
-            return ['error' => 'El nombre no puede estar vacío'];
-        }
-
-        $this->model->create($nombre);
-        return ['success' => 'Departamento creado correctamente'];
+    // Crear nuevo departamento
+    public function store(string $nombre): bool {
+        if (trim($nombre) === '') return false;
+        return $this->model->create($nombre);
     }
 
-    // Actualizar
-    public function update($id, $data) {
-        $nombre = trim($data['nombre'] ?? '');
-        if ($nombre === '') {
-            return ['error' => 'El nombre no puede estar vacío'];
-        }
-
-        $this->model->update($id, $nombre);
-        return ['success' => 'Departamento actualizado correctamente'];
+    // Actualizar departamento
+    public function update(int $id, string $nombre): bool {
+        if ($id <= 0 || trim($nombre) === '') return false;
+        return $this->model->update($id, $nombre);
     }
 
-    // Eliminar
-    public function destroy($id) {
-        $this->model->delete($id);
-        return ['success' => 'Departamento eliminado correctamente'];
+    // Eliminar departamento
+    public function delete(int $id): bool {
+        if ($id <= 0) return false;
+        return $this->model->delete($id);
     }
 }
