@@ -13,14 +13,20 @@ class ProvinciaController {
     }
 
     /**
-     * Listar provincias con búsqueda y límite opcional
+     * Listar provincias con búsqueda, límite y offset para paginación
      *
      * @param string $search Texto a buscar por nombre
-     * @param int $limit Cantidad máxima de registros
+     * @param int $limit Cantidad máxima de registros por página
+     * @param int $offset Registro desde donde empezar
      * @return array
      */
-    public function index(string $search = '', int $limit = 20): array {
-        return $this->provinciaModel->getAll($search, $limit);
+    public function index(string $search = '', int $limit = 20, int $offset = 0): array {
+        return $this->provinciaModel->getAll($search, $limit, $offset);
+    }
+
+    // Contar provincias (para calcular páginas)
+    public function count(string $search = ''): int {
+        return $this->provinciaModel->count($search);
     }
 
     // Obtener todos los departamentos para poblar select
@@ -33,9 +39,7 @@ class ProvinciaController {
         $nombre = $data['nombre'] ?? '';
         $id_departamento = $data['id_departamento'] ?? 0;
 
-        if (empty($nombre) || $id_departamento <= 0) {
-            return false;
-        }
+        if (empty($nombre) || $id_departamento <= 0) return false;
 
         return $this->provinciaModel->create($nombre, $id_departamento);
     }
@@ -50,9 +54,7 @@ class ProvinciaController {
         $nombre = $data['nombre'] ?? '';
         $id_departamento = $data['id_departamento'] ?? 0;
 
-        if (empty($nombre) || $id <= 0) {
-            return false;
-        }
+        if (empty($nombre) || $id <= 0) return false;
 
         return $this->provinciaModel->update($id, $nombre, $id_departamento);
     }

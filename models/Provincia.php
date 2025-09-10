@@ -24,6 +24,17 @@ class Provincia {
         $stmt->execute();
         return $stmt->fetchAll();
     }
+    // Contar provincias (para paginación y búsqueda)
+public function count(string $search = ''): int {
+    $sql = "SELECT COUNT(*) FROM provincias p
+            LEFT JOIN departamentos d ON p.id_departamento = d.id_departamento
+            WHERE p.nombre LIKE :search";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+    $stmt->execute();
+    return (int)$stmt->fetchColumn();
+}
+
 
     // 🔹 Obtener provincias por departamento_id
     public function getByDepartamento(int $departamentoId): array {

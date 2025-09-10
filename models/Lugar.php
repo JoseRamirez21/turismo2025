@@ -10,8 +10,8 @@ class Lugar {
         $this->pdo = $pdo;
     }
 
-    // 🔹 Listar todos con búsqueda y límite
-    public function getAll(int $limit = 20, string $search = ''): array {
+    // 🔹 Listar todos con búsqueda, límite y offset
+    public function getAll(int $limit = 20, int $offset = 0, string $search = ''): array {
         $sql = "
             SELECT l.id_lugar, l.nombre, l.tipo, d.nombre AS distrito_nombre
             FROM lugares_turisticos l
@@ -22,7 +22,7 @@ class Lugar {
             $sql .= " WHERE l.nombre LIKE :search ";
         }
 
-        $sql .= " ORDER BY l.id_lugar ASC LIMIT :limit";
+        $sql .= " ORDER BY l.id_lugar ASC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -31,9 +31,25 @@ class Lugar {
         }
 
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 🔹 Contar registros para paginación
+    public function count(string $search = ''): int {
+        $sql = "SELECT COUNT(*) as total FROM lugares_turisticos";
+        if (!empty($search)) {
+            $sql .= " WHERE nombre LIKE :search";
+        }
+        $stmt = $this->pdo->prepare($sql);
+        if (!empty($search)) {
+            $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $row['total'];
     }
 
     // 🔹 Obtener lugares por distrito

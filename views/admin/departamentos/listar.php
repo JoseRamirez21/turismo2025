@@ -2,13 +2,18 @@
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../controllers/DepartamentoController.php';
 
+// Obtener parámetros de búsqueda y página
 $search = $_GET['search'] ?? '';
+$page   = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $limit  = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
-$offset = 0; // puedes usar paginación más adelante
 
 $controller = new DepartamentoController();
-$departamentos = $controller->index($search, $limit, $offset);
-$total = $controller->count($search);
+$result = $controller->index($search, $page, $limit);
+
+$departamentos = $result['data'];
+$total         = $result['total'];
+$totalPages    = $result['totalPages'];
+$currentPage   = $result['page'];
 
 $pageTitle = "Departamentos";
 require view_path('views/admin/templates/header.php');
@@ -17,15 +22,11 @@ require view_path('views/admin/templates/topbar.php');
 
 <div class="container-fluid">
   <div class="row">
-    <!-- Sidebar -->
     <div class="col-md-3 col-lg-2 p-0">
       <?php require view_path('views/admin/templates/sidebar.php'); ?>
     </div>
 
-    <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
-
-      <!-- Encabezado con búsqueda y límite -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-primary">📍 Departamentos</h2>
 
@@ -36,15 +37,10 @@ require view_path('views/admin/templates/topbar.php');
               <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
               <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
               <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
-              <option value="200" <?= $limit == 200 ? 'selected' : '' ?>>200</option>
             </select>
 
-            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
-                   class="form-control form-control-sm me-2" placeholder="Buscar por nombre...">
-
-            <button type="submit" class="btn btn-sm btn-primary">
-              <i class="bi bi-search"></i> Buscar
-            </button>
+            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" class="form-control form-control-sm me-2" placeholder="Buscar...">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search"></i> Buscar</button>
           </form>
 
           <a href="crear.php" class="btn btn-success btn-sm">
@@ -53,7 +49,6 @@ require view_path('views/admin/templates/topbar.php');
         </div>
       </div>
 
-      <!-- Tabla -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="table-responsive">
@@ -67,7 +62,7 @@ require view_path('views/admin/templates/topbar.php');
               </thead>
               <tbody>
                 <?php if ($departamentos): ?>
-                  <?php $i = 1; ?>
+                  <?php $i = ($currentPage - 1) * $limit + 1; ?>
                   <?php foreach ($departamentos as $d): ?>
                     <tr>
                       <td><?= $i++ ?></td>
@@ -76,13 +71,8 @@ require view_path('views/admin/templates/topbar.php');
                         <a href="editar.php?id=<?= $d['id_departamento'] ?>" class="btn btn-warning btn-sm me-2">
                           <i class="bi bi-pencil-square"></i> Editar
                         </a>
-                        <a href="#" 
-                           class="btn btn-danger btn-sm"
-                           data-bs-toggle="modal"
-                           data-bs-target="#deleteModal"
-                           data-id="<?= $d['id_departamento'] ?>"
-                           data-nombre="<?= htmlspecialchars($d['nombre']) ?>">
-                           <i class="bi bi-trash"></i> Eliminar
+                        <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $d['id_departamento'] ?>" data-nombre="<?= htmlspecialchars($d['nombre']) ?>">
+                          <i class="bi bi-trash"></i> Eliminar
                         </a>
                       </td>
                     </tr>
@@ -95,13 +85,26 @@ require view_path('views/admin/templates/topbar.php');
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación -->
+          <?php if ($totalPages > 1): ?>
+            <nav aria-label="Paginación">
+              <ul class="pagination justify-content-center mt-3">
+                <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+                  <li class="page-item <?= $p == $currentPage ? 'active' : '' ?>">
+                    <a class="page-link" href="?search=<?= urlencode($search) ?>&limit=<?= $limit ?>&page=<?= $p ?>"><?= $p ?></a>
+                  </li>
+                <?php endfor; ?>
+              </ul>
+            </nav>
+          <?php endif; ?>
         </div>
       </div>
     </main>
   </div>
 </div>
 
-<!-- Modal Eliminar -->
+<!-- Modal eliminar -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg border-0 rounded-3">
@@ -113,9 +116,7 @@ require view_path('views/admin/templates/topbar.php');
         <p class="mb-3">¿Seguro que deseas eliminar el departamento <strong id="nombreDepartamento"></strong>?</p>
         <form id="deleteForm" method="POST" action="eliminar.php">
           <input type="hidden" name="id" id="deleteId">
-          <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Sí, eliminar
-          </button>
+          <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Sí, eliminar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </form>
       </div>
@@ -123,9 +124,7 @@ require view_path('views/admin/templates/topbar.php');
   </div>
 </div>
 
-
 <?php require view_path('views/admin/templates/footer.php'); ?>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var deleteModal = document.getElementById('deleteModal');

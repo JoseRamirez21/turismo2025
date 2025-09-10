@@ -9,14 +9,23 @@ class DepartamentoController {
         $this->model = new Departamento();
     }
 
-    // Listar departamentos con búsqueda y límite
-    public function index(string $search = '', int $limit = 20, int $offset = 0): array {
-        return $this->model->getAll($search, $limit, $offset);
-    }
+    // Listar departamentos con búsqueda y paginación
+    public function index(string $search = '', int $page = 1, int $limit = 20): array {
+        $page = max(1, $page); // página mínima = 1
+        $offset = ($page - 1) * $limit;
 
-    // Contar departamentos (para paginación)
-    public function count(string $search = ''): int {
-        return $this->model->count($search);
+        $data = $this->model->getAll($search, $limit, $offset); // datos
+        $total = $this->model->count($search); // total de registros
+        $totalPages = (int) ceil($total / $limit); // total de páginas
+
+        return [
+            'data' => $data,
+            'total' => $total,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'search' => $search,
+            'limit' => $limit,
+        ];
     }
 
     // Obtener un departamento

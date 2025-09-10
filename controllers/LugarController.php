@@ -1,42 +1,50 @@
 <?php
 // controllers/LugarController.php
 require_once __DIR__ . '/../models/Lugar.php';
+require_once __DIR__ . '/../models/Distrito.php';
 
 class LugarController {
-    private $model;
+    private $lugarModel;
+    private $distritoModel;
 
     public function __construct() {
-        $this->model = new Lugar();
+        $this->lugarModel = new Lugar();
+        $this->distritoModel = new Distrito();
     }
 
-    // 🔹 Listar con límite y búsqueda
-    public function index($limit = 20, $search = ''): array {
-        return $this->model->getAll($limit, $search);
+    // 🔹 Listar lugares con límite, offset y búsqueda
+    public function index(int $limit = 20, int $offset = 0, string $search = ''): array {
+        return $this->lugarModel->getAll($limit, $offset, $search);
     }
 
-    // 🔹 Obtener lugares por distrito
-    public function getByDistrito(int $id_distrito): array {
-        return $this->model->getByDistrito($id_distrito);
+    // 🔹 Contar lugares (para paginación)
+    public function count(string $search = ''): int {
+        return $this->lugarModel->count($search);
+    }
+
+    // 🔹 Obtener distritos para select en creación/edición
+    public function getDistritos(): array {
+        return $this->distritoModel->getAll();
     }
 
     // 🔹 Guardar un nuevo lugar
     public function store(array $data): bool {
-        return $this->model->create($data);
+        return $this->lugarModel->create($data);
     }
 
     // 🔹 Obtener un lugar para edición
-    public function edit(int $id): ?array {
-        return $this->model->getById($id);
+    public function show(int $id): ?array {
+        return $this->lugarModel->getById($id);
     }
 
     // 🔹 Actualizar un lugar existente
     public function update(int $id, array $data): bool {
-        return $this->model->update($id, $data);
+        return $this->lugarModel->update($id, $data);
     }
 
     // 🔹 Eliminar un lugar
-    public function destroy(int $id): bool {
-        return $this->model->delete($id);
+    public function delete(int $id): bool {
+        return $this->lugarModel->delete($id);
     }
 }
 

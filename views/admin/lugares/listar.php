@@ -7,8 +7,13 @@ $controller = new LugarController();
 // Valores predeterminados
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
 
-$lugares = $controller->index($limit, $search);
+// Obtener lugares y total para paginación
+$lugares = $controller->index($limit, $offset, $search);
+$total = $controller->count($search);
+$totalPages = ceil($total / $limit);
 
 $pageTitle = "Lugares Turísticos";
 require view_path('views/admin/templates/header.php');
@@ -43,9 +48,8 @@ require view_path('views/admin/templates/topbar.php');
                    class="form-control form-control-sm me-2" placeholder="Buscar por nombre...">
 
             <button type="submit" class="btn btn-sm btn-primary">
-  <i class="bi bi-search"></i> Buscar
-</button>
-
+              <i class="bi bi-search"></i> Buscar
+            </button>
           </form>
 
           <a href="crear.php" class="btn btn-success btn-sm">
@@ -70,7 +74,7 @@ require view_path('views/admin/templates/topbar.php');
               </thead>
               <tbody>
                 <?php if ($lugares): ?>
-                  <?php $contador = 1; ?>
+                  <?php $contador = $offset + 1; ?>
                   <?php foreach ($lugares as $lugar): ?>
                     <tr>
                       <td><?= $contador++ ?></td>
@@ -100,8 +104,23 @@ require view_path('views/admin/templates/topbar.php');
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación -->
+          <?php if ($totalPages > 1): ?>
+            <nav aria-label="Page navigation" class="mt-3">
+              <ul class="pagination justify-content-center flex-wrap">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                  <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                    <a class="page-link" href="?page=<?= $i ?>&limit=<?= $limit ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                  </li>
+                <?php endfor; ?>
+              </ul>
+            </nav>
+          <?php endif; ?>
+
         </div>
       </div>
+
     </main>
   </div>
 </div>

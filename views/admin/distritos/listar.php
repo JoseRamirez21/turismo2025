@@ -4,13 +4,17 @@ require_once __DIR__ . '/../../../controllers/DistritoController.php';
 
 $controller = new DistritoController();
 
-// Capturar parámetros de búsqueda y cantidad a mostrar
+// Parámetros de búsqueda y paginación
 $search = $_GET['search'] ?? '';
 $limit = (int)($_GET['limit'] ?? 20);
-$offset = 0;
+$page = (int)($_GET['page'] ?? 1);
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
 
-// Obtener los distritos según búsqueda
+// Obtener distritos y total
 $distritos = $controller->index($search, $limit, $offset);
+$total = $controller->count($search);
+$totalPages = ceil($total / $limit);
 
 $pageTitle = "Distritos";
 require view_path('views/admin/templates/header.php');
@@ -27,42 +31,38 @@ require view_path('views/admin/templates/topbar.php');
     <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
 
+      <!-- Encabezado búsqueda y botón nuevo -->
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 flex-nowrap overflow-auto">
+        <h2 class="fw-bold text-warning me-3">🏙️ Distritos</h2>
 
-      <!-- Buscar y mostrar -->
-    <!-- Encabezado con búsqueda, límite y botón en una sola fila -->
-<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 flex-nowrap overflow-auto">
-  <h2 class="fw-bold text-warning me-3">🏙️ Distritos</h2>
+        <div class="d-flex align-items-center gap-2 flex-nowrap">
 
-  <div class="d-flex align-items-center gap-2 flex-nowrap">
+          <!-- Formulario de búsqueda y límite -->
+          <form method="GET" class="d-flex align-items-center gap-2 mb-0 flex-nowrap">
+            <label for="limit" class="mb-0">Mostrar:</label>
+            <select name="limit" id="limit" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+              <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
+              <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+              <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+              <option value="200" <?= $limit == 200 ? 'selected' : '' ?>>200</option>
+            </select>
 
-    <!-- Formulario de búsqueda y límite -->
-    <form method="GET" class="d-flex align-items-center gap-2 mb-0 flex-nowrap">
-      <label for="limit" class="mb-0">Mostrar:</label>
-      <select name="limit" id="limit" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-        <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
-        <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
-        <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
-        <option value="200" <?= $limit == 200 ? 'selected' : '' ?>>200</option>
-      </select>
+            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                   class="form-control form-control-sm" style="min-width: 150px;" placeholder="Buscar por nombre...">
 
-      <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
-             class="form-control form-control-sm" style="min-width: 150px;" placeholder="Buscar por nombre...">
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </form>
 
-      <button type="submit" class="btn btn-sm btn-primary">
-        <i class="bi bi-search"></i> Buscar
-      </button>
-    </form>
+          <a href="crear.php" class="btn btn-success btn-sm flex-shrink-0">
+            <i class="bi bi-plus-circle"></i> Nuevo Distrito
+          </a>
 
-    <!-- Botón “Nuevo Distrito” fuera del form -->
-    <a href="crear.php" class="btn btn-success btn-sm flex-shrink-0">
-      <i class="bi bi-plus-circle"></i> Nuevo Distrito
-    </a>
+        </div>
+      </div>
 
-  </div>
-</div>
-
-
-      <!-- Tabla -->
+      <!-- Tabla de distritos -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="table-responsive">
@@ -107,6 +107,20 @@ require view_path('views/admin/templates/topbar.php');
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación tipo cuadritos -->
+          <?php if ($totalPages > 1): ?>
+            <nav aria-label="Paginación de distritos">
+              <ul class="pagination justify-content-center mt-3 flex-wrap gap-1">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                  <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                    <a class="page-link" href="?search=<?= urlencode($search) ?>&limit=<?= $limit ?>&page=<?= $i ?>"><?= $i ?></a>
+                  </li>
+                <?php endfor; ?>
+              </ul>
+            </nav>
+          <?php endif; ?>
+
         </div>
       </div>
     </main>

@@ -2,13 +2,16 @@
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../controllers/ProvinciaController.php';
 
+// Capturamos parámetros de búsqueda y paginación
+$search = $_GET['search'] ?? '';
+$limit  = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+$page   = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
+
 $controller = new ProvinciaController();
-
-// Valores predeterminados
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-$provincias = $controller->index($search, $limit);
+$provincias = $controller->index($search, $limit, $offset);
+$total = $controller->count($search);
+$totalPages = $limit > 0 ? ceil($total / $limit) : 1;
 
 $pageTitle = "Provincias";
 require view_path('views/admin/templates/header.php');
@@ -25,12 +28,11 @@ require view_path('views/admin/templates/topbar.php');
     <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
 
-      <!-- Encabezado con búsqueda y botón en una sola fila -->
+      <!-- Encabezado con búsqueda y límite -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-success">🗺️ Provincias</h2>
 
         <div class="d-flex align-items-center">
-          <!-- Formulario de búsqueda y límite -->
           <form method="GET" class="d-flex align-items-center me-2">
             <label for="limit" class="me-1">Mostrar:</label>
             <select name="limit" id="limit" class="form-select form-select-sm me-2 w-auto" onchange="this.form.submit()">
@@ -48,14 +50,13 @@ require view_path('views/admin/templates/topbar.php');
             </button>
           </form>
 
-          <!-- Botón Nuevo Provincia -->
           <a href="crear.php" class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle"></i> Nueva Provincia
+            <i class="bi bi-plus-circle"></i> Nueva
           </a>
         </div>
       </div>
 
-      <!-- Tabla de Provincias -->
+      <!-- Tabla -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="table-responsive">
@@ -70,17 +71,17 @@ require view_path('views/admin/templates/topbar.php');
               </thead>
               <tbody>
                 <?php if ($provincias): ?>
-                  <?php $i = 1; ?>
+                  <?php $i = $offset + 1; ?>
                   <?php foreach ($provincias as $p): ?>
                     <tr>
                       <td><?= $i++ ?></td>
                       <td><?= htmlspecialchars($p['nombre']) ?></td>
                       <td><?= htmlspecialchars($p['departamento_nombre'] ?? '—') ?></td>
                       <td class="text-center">
-                        <a href="editar.php?id=<?= $p['id_provincia'] ?>" class="btn btn-warning btn-sm me-1">
+                        <a href="editar.php?id=<?= $p['id_provincia'] ?>" class="btn btn-warning btn-sm me-2">
                           <i class="bi bi-pencil-square"></i> Editar
                         </a>
-                        <a href="#"
+                        <a href="#" 
                            class="btn btn-danger btn-sm"
                            data-bs-toggle="modal"
                            data-bs-target="#deleteModal"
@@ -101,6 +102,19 @@ require view_path('views/admin/templates/topbar.php');
           </div>
         </div>
       </div>
+
+      <!-- Paginación -->
+      <?php if ($totalPages > 1): ?>
+        <nav class="mt-3">
+          <ul class="pagination justify-content-center">
+            <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+              <li class="page-item <?= $p == $page ? 'active' : '' ?>">
+                <a class="page-link" href="?search=<?= urlencode($search) ?>&limit=<?= $limit ?>&page=<?= $p ?>"><?= $p ?></a>
+              </li>
+            <?php endfor; ?>
+          </ul>
+        </nav>
+      <?php endif; ?>
 
     </main>
   </div>
