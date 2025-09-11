@@ -11,7 +11,7 @@ $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' :
 $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 // Cambia esto por la carpeta de tu proyecto en htdocs
-$projectFolder = '/turismo2025';
+$projectFolder = '/turismo2025-2';
 define('BASE_URL', $scheme . '://' . $host . $projectFolder);
 
 // URL de la API (para hosting)
@@ -43,7 +43,7 @@ class Database {
     private string $host     = "localhost";
     private string $dbname   = "turismo_peru";
     private string $username = "root";
-    private string $password = "root";
+    private string $password = "";
     private ?PDO $conn = null;
 
     public function getConnection(): ?PDO {
