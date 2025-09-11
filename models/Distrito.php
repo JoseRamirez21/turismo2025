@@ -79,4 +79,20 @@ class Distrito {
         $stmt = $this->pdo->prepare("DELETE FROM distritos WHERE id_distrito = ?");
         return $stmt->execute([$id_distrito]);
     }
+    // Obtener distrito con información completa (provincia y departamento)
+public function getByIdFull(int $id_distrito): ?array {
+    $stmt = $this->pdo->prepare("
+        SELECT d.id_distrito, d.nombre AS distrito_nombre,
+               p.id_provincia, p.nombre AS provincia_nombre,
+               dp.id_departamento, dp.nombre AS departamento_nombre
+        FROM distritos d
+        INNER JOIN provincias p ON d.id_provincia = p.id_provincia
+        INNER JOIN departamentos dp ON p.id_departamento = dp.id_departamento
+        WHERE d.id_distrito = ?
+    ");
+    $stmt->execute([$id_distrito]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
+}
+
 }

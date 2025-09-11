@@ -33,9 +33,19 @@ class DistritoController {
     }
 
     // Obtener un distrito para edición
-    public function edit(int $id): ?array {
-        return $this->distritoModel->getById($id);
-    }
+ public function edit(int $id): ?array {
+    $distrito = $this->distritoModel->getByIdFull($id);
+    if (!$distrito) return null;
+
+    // Obtener todas las provincias del departamento del distrito
+    $provincias = $this->provinciaModel->getByDepartamento($distrito['id_departamento']);
+
+    return [
+        'distrito' => $distrito,
+        'provincias' => $provincias
+    ];
+}
+
 
     // Actualizar distrito
     public function update(int $id, array $data): bool {
@@ -46,4 +56,9 @@ class DistritoController {
     public function destroy(int $id): bool {
         return $this->distritoModel->delete($id);
     }
+    // Obtener un distrito por ID
+public function show(int $id): ?array {
+    return $this->distritoModel->getById($id);
+}
+
 }

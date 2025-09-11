@@ -19,7 +19,8 @@ if (!$id) {
     exit;
 }
 
-$lugar = $controller->edit((int)$id);
+$lugar = $controller->show($_GET['id']);
+
 if (!$lugar) {
     header("Location: listar.php");
     exit;

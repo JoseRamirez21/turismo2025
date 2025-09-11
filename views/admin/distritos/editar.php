@@ -8,11 +8,30 @@ $controller = new DistritoController();
 $departamentoModel = new Departamento();
 $provinciaModel = new Provincia();
 
+// Capturar ID del distrito
+$id = $_GET['id'] ?? null;
+if (!$id) {
+    header("Location: listar.php");
+    exit;
+}
+
+// Obtener datos del distrito junto con provincias del departamento
+$data = $controller->edit((int)$id);
+if (!$data) {
+    header("Location: listar.php");
+    exit;
+}
+
+$distrito = $data['distrito'];
+$provincias = $data['provincias'];
+
+// Obtener todos los departamentos
 $departamentos = $departamentoModel->getAll();
 
 $errors = [];
 $success = null;
 
+// Guardar cambios
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_provincia = $_POST['id_provincia'] ?? null;
     $nombre = trim($_POST['nombre'] ?? '');
@@ -21,16 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nombre)) $errors[] = "El nombre del distrito es obligatorio.";
 
     if (empty($errors)) {
-        if ($controller->store(['id_provincia' => $id_provincia, 'nombre' => $nombre])) {
+        if ($controller->update((int)$id, ['id_provincia' => $id_provincia, 'nombre' => $nombre])) {
             header("Location: listar.php");
             exit;
         } else {
-            $errors[] = "Error al guardar el distrito.";
+            $errors[] = "Error al actualizar el distrito.";
         }
     }
 }
 
-$pageTitle = "Nuevo Distrito";
+$pageTitle = "Editar Distrito";
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
@@ -44,16 +63,14 @@ require view_path('views/admin/templates/topbar.php');
 
     <!-- Contenido principal -->
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
-
-      <!-- Encabezado -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-warning">➕ Nuevo Distrito</h2>
+        <h2 class="fw-bold text-warning">✏️ Editar Distrito</h2>
         <a href="listar.php" class="btn btn-secondary btn-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
       </div>
 
-      <!-- Mensajes -->
+      <!-- Mensajes de error -->
       <?php if ($errors): ?>
         <div class="alert alert-danger">
           <ul class="mb-0">
@@ -72,10 +89,11 @@ require view_path('views/admin/templates/topbar.php');
             <!-- Departamento -->
             <div class="mb-3">
               <label class="form-label fw-bold">Departamento</label>
-              <select id="departamento" class="form-select">
+              <select id="departamento" class="form-select" required>
                 <option value="">Seleccione un departamento</option>
                 <?php foreach ($departamentos as $dep): ?>
-                  <option value="<?= $dep['id_departamento'] ?>">
+                  <option value="<?= $dep['id_departamento'] ?>"
+                    <?= $dep['id_departamento'] == $distrito['id_departamento'] ? 'selected' : '' ?>>
                     <?= htmlspecialchars($dep['nombre']) ?>
                   </option>
                 <?php endforeach; ?>
@@ -87,23 +105,29 @@ require view_path('views/admin/templates/topbar.php');
               <label class="form-label fw-bold">Provincia</label>
               <select name="id_provincia" id="provincia" class="form-select" required>
                 <option value="">Seleccione una provincia</option>
+                <?php foreach ($provincias as $prov): ?>
+                  <option value="<?= $prov['id_provincia'] ?>"
+                    <?= $prov['id_provincia'] == $distrito['id_provincia'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($prov['nombre']) ?>
+                  </option>
+                <?php endforeach; ?>
               </select>
             </div>
 
-            <!-- Nombre Distrito -->
+            <!-- Nombre del Distrito -->
             <div class="mb-3">
               <label for="nombre" class="form-label fw-bold">Nombre del distrito</label>
-              <input type="text" class="form-control" id="nombre" name="nombre" required>
+              <input type="text" class="form-control" id="nombre" name="nombre"
+                     value="<?= htmlspecialchars($distrito['distrito_nombre']) ?>" required>
             </div>
 
             <button type="submit" class="btn btn-success">
-              <i class="bi bi-check-circle"></i> Guardar
+              <i class="bi bi-check-circle"></i> Actualizar
             </button>
             <a href="listar.php" class="btn btn-outline-secondary">Cancelar</a>
           </form>
         </div>
       </div>
-
     </main>
   </div>
 </div>
