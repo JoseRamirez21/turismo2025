@@ -50,4 +50,9 @@ class DepartamentoController {
         if ($id <= 0) return false;
         return $this->model->delete($id);
     }
+    // Dentro de DepartamentoController
+public function count(string $search = ''): int {
+    return $this->model->count($search);
+}
+
 }
