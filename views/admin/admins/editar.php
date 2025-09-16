@@ -1,33 +1,45 @@
 <?php
 require_once __DIR__ . '/../../../config/config.php';
-require_once __DIR__ . '/../../../models/Departamento.php';
+require_once __DIR__ . '/../../../models/Admin.php';
 
-$departamentoModel = new Departamento();
+$adminModel = new Admin();
+
+$id = $_GET['id'] ?? null;
+if (!$id || !is_numeric($id)) {
+    header("Location: listar.php");
+    exit;
+}
+
+$admin = $adminModel->getById((int)$id);
+if (!$admin) {
+    header("Location: listar.php");
+    exit;
+}
 
 $errors = [];
 $success = null;
 
 // Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
+    $nombre   = trim($_POST['nombre'] ?? '');
+    $email    = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-    if (empty($nombre)) {
-        $errors[] = "El nombre del departamento es obligatorio.";
-    }
+    if (empty($nombre)) $errors[] = "El nombre es obligatorio.";
+    if (empty($email)) $errors[] = "El correo electrónico es obligatorio.";
 
     if (empty($errors)) {
-        if ($departamentoModel->create($nombre)) {
-            $success = "Departamento creado correctamente.";
-            // Redirigir al listar
-            header("Location: listar.php");
+        if ($adminModel->update((int)$id, $nombre, $email, $password ?: null)) {
+            $success = "Administrador actualizado correctamente.";
+            header("Location: listar.php?updated=1");
             exit;
         } else {
-            $errors[] = "Error al guardar el departamento.";
+            $errors[] = "Error al actualizar el administrador.";
         }
     }
 }
 
-$pageTitle = "Nuevo Departamento";
+$pageTitle = "Editar Administrador";
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
@@ -43,7 +55,7 @@ require view_path('views/admin/templates/topbar.php');
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
       <!-- Encabezado -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-primary">➕ Nuevo Departamento</h2>
+        <h2 class="fw-bold text-primary">✏️ Editar Administrador</h2>
         <a href="listar.php" class="btn btn-warning btn-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
@@ -69,12 +81,25 @@ require view_path('views/admin/templates/topbar.php');
         <div class="card-body">
           <form method="POST">
             <div class="mb-3">
-              <label for="nombre" class="form-label fw-bold">Nombre del departamento</label>
+              <label for="nombre" class="form-label fw-bold">Nombre</label>
               <input type="text" class="form-control" id="nombre" name="nombre" 
-                     value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" required>
+                     value="<?= htmlspecialchars($_POST['nombre'] ?? $admin['nombre']) ?>" required>
             </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label fw-bold">Correo electrónico</label>
+              <input type="email" class="form-control" id="email" name="email" 
+                     value="<?= htmlspecialchars($_POST['email'] ?? $admin['email']) ?>" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label fw-bold">Contraseña (opcional)</label>
+              <input type="password" class="form-control" id="password" name="password"
+                     placeholder="Dejar en blanco si no deseas cambiarla">
+            </div>
+
             <button type="submit" class="btn btn-primary">
-              <i class="bi bi-check-circle"></i> Guardar
+              <i class="bi bi-check-circle"></i> Actualizar
             </button>
             <a href="listar.php" class="btn btn-outline-danger">Cancelar</a>
           </form>

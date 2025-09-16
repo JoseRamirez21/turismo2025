@@ -24,20 +24,20 @@ class AdminController {
         return $this->model->getById($id);
     }
 
-    // 🔹 Crear nuevo administrador
-    public function store(string $nombre, string $email, string $usuario, string $password): bool {
-        if (trim($nombre) === '' || trim($email) === '' || trim($usuario) === '' || trim($password) === '') {
+    // 🔹 Crear nuevo administrador (solo nombre, email, password)
+    public function store(string $nombre, string $email, string $password): bool {
+        if (trim($nombre) === '' || trim($email) === '' || trim($password) === '') {
             return false;
         }
-        return $this->model->create($nombre, $email, $usuario, $password);
+        return $this->model->create($nombre, $email, $password);
     }
 
-    // 🔹 Actualizar administrador
-    public function update(int $id, string $nombre, string $email, string $usuario, ?string $password = null): bool {
-        if ($id <= 0 || trim($nombre) === '' || trim($email) === '' || trim($usuario) === '') {
+    // 🔹 Actualizar administrador (sin usuario)
+    public function update(int $id, string $nombre, string $email, ?string $password = null): bool {
+        if ($id <= 0 || trim($nombre) === '' || trim($email) === '') {
             return false;
         }
-        return $this->model->update($id, $nombre, $email, $usuario, $password);
+        return $this->model->update($id, $nombre, $email, $password);
     }
 
     // 🔹 Eliminar administrador
@@ -46,7 +46,7 @@ class AdminController {
         return $this->model->delete($id);
     }
 
-    // 🔹 Login
+    // 🔹 Login con email y password
     public function login(string $email, string $clave): ?array {
         if (trim($email) === '' || trim($clave) === '') return null;
         return $this->model->login($email, $clave);

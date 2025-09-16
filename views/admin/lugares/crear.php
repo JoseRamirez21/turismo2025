@@ -49,8 +49,8 @@ require view_path('views/admin/templates/topbar.php');
 
     <main class="col-md-9 col-lg-10 px-md-4 py-4">
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-warning">➕ Nuevo Lugar Turístico</h2>
-        <a href="listar.php" class="btn btn-secondary btn-sm">
+        <h2 class="fw-bold text-primary">➕ Nuevo Lugar Turístico</h2>
+        <a href="listar.php" class="btn btn-warning btn-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
       </div>
@@ -128,10 +128,10 @@ require view_path('views/admin/templates/topbar.php');
               <input type="text" name="longitud" class="form-control">
             </div>
 
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-primary">
               <i class="bi bi-check-circle"></i> Guardar
             </button>
-            <a href="listar.php" class="btn btn-outline-secondary">Cancelar</a>
+            <a href="listar.php" class="btn btn-outline-danger">Cancelar</a>
 
           </form>
         </div>

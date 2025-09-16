@@ -50,8 +50,8 @@ require view_path('views/admin/templates/topbar.php');
 
       <!-- Encabezado -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="fw-bold text-success">➕ Nueva Provincia</h2>
-        <a href="listar.php" class="btn btn-secondary btn-sm">
+        <h2 class="fw-bold text-primary">➕ Nueva Provincia</h2>
+        <a href="listar.php" class="btn btn-warning btn-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
       </div>
@@ -88,10 +88,10 @@ require view_path('views/admin/templates/topbar.php');
                 <?php endforeach; ?>
               </select>
             </div>
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-primary">
               <i class="bi bi-check-circle"></i> Guardar
             </button>
-            <a href="listar.php" class="btn btn-outline-secondary">Cancelar</a>
+            <a href="listar.php" class="btn btn-outline-danger">Cancelar</a>
           </form>
         </div>
       </div>
