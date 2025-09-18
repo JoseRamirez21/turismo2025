@@ -6,16 +6,18 @@
 // Nombre del sistema
 define('APP_NAME', 'Turismo Perú SAC');
 
-// BASE_URL para XAMPP
+// BASE_URL de tu aplicación
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-// Cambia esto por la carpeta de tu proyecto en htdocs
-$projectFolder = '/turismo2025';
+$projectFolder = ''; // 🔧 En hosting generalmente vacío
 define('BASE_URL', $scheme . '://' . $host . $projectFolder);
 
-// URL de la API (para hosting)
-define('API_BASE_URL', 'https://api.tudominio.com'); // 🔧 cambiar para hosting
+// =========================================
+// CONFIGURACIÓN DE APIs (completar cuando estén listas)
+// =========================================
+
+// Ejemplo: define('API_BASE_URL', 'https://api.tudominio.com');
+define('API_BASE_URL', ''); // 🔧 dejar vacío hasta tener API lista
 
 // =========================================
 // HELPERS
@@ -40,10 +42,12 @@ function view_path(string $relative): string {
 // =========================================
 
 class Database {
-    private string $host     = "localhost";
-    private string $dbname   = "turismo_peru";
-    private string $username = "root";
-    private string $password = "root";
+    // 🔧 Completar en hosting
+    private string $host     = ""; 
+    private string $dbname   = "";
+    private string $username = "";
+    private string $password = "";
+
     private ?PDO $conn = null;
 
     public function getConnection(): ?PDO {
@@ -56,13 +60,13 @@ class Database {
                     PDO::ATTR_EMULATE_PREPARES   => false,
                 ]);
             } catch (PDOException $e) {
-                die("❌ Error de conexión a la base de datos '{$this->dbname}': " . $e->getMessage());
+                die("❌ Error de conexión a la base de datos: " . $e->getMessage());
             }
         }
         return $this->conn;
     }
 }
 
-// Conexión global lista
+// Conexión global (lista para usar en tus modelos/controladores)
 $db  = new Database();
 $pdo = $db->getConnection();

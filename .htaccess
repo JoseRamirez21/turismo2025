@@ -1,0 +1,36 @@
+# ==============================
+# Seguridad básica para tu sistema
+# ==============================
+
+# Evitar que se vean los archivos .htaccess o similares
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Bloquear acceso directo a archivos sensibles
+<FilesMatch "(^config\.php|\.env|composer\.json|composer\.lock|db\.php|config\.ini)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Bloquear acceso directo a carpetas internas
+RewriteEngine On
+
+RewriteRule ^(controllers|models|config)/ - [F,L]
+
+# ==============================
+# Seguridad adicional
+# ==============================
+
+# Desactivar listado de directorios
+Options -Indexes
+
+# Forzar UTF-8
+AddDefaultCharset UTF-8
+
+# ==============================
+# Errores personalizados
+# ==============================
+ErrorDocument 403 "Acceso prohibido."
+ErrorDocument 404 "Página no encontrada."

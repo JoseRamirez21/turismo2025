@@ -1,0 +1,57 @@
+# =========================================
+#  ARCHIVOS DE CONFIGURACIÓN (SENSIBLES)
+# =========================================
+# ❌ No deberían subirse porque contienen credenciales o datos privados
+# config/config.php      # Configuración principal
+# config/configW.php     # Configuración para Windows (IGNORAR)
+# config/configM.php     # Configuración para Mac (IGNORAR)
+#
+# ✅ En su lugar, crea un archivo de ejemplo sin credenciales:
+# config/config.example.php
+
+# =========================================
+#  DEPENDENCIAS
+# =========================================
+# Carpetas generadas automáticamente por gestores de paquetes
+# /vendor/               # Composer (PHP)
+/node_modules/           # NPM (JavaScript)
+
+# =========================================
+#  ARCHIVOS TEMPORALES Y LOGS
+# =========================================
+# /logs/                 # Carpeta de logs
+# /cache/                # Carpeta de caché
+# /tmp/                  # Archivos temporales
+# /sessions/             # Archivos de sesión
+# *.log                  # Cualquier archivo con extensión .log
+# *.lock                 # Archivos de bloqueo (ej: composer.lock, package-lock.json)
+
+# =========================================
+#  VARIABLES DE ENTORNO
+# =========================================
+# .env                   # Variables de entorno
+# *.env                  # Cualquier archivo .env
+# *.local                # Configuración local
+
+# =========================================
+#  ARCHIVOS DEL SISTEMA / EDITORES
+# =========================================
+# .idea/                 # Configuración de PhpStorm / IntelliJ
+# .vscode/               # Configuración de Visual Studio Code
+# *.sublime-project
+# *.sublime-workspace
+# .DS_Store              # macOS
+# Thumbs.db              # Windows
+# desktop.ini            # Windows
+
+# =========================================
+#  ARCHIVOS DE RESPALDO Y COMPRESIÓN
+# =========================================
+# *.sql                  # Backups de bases de datos
+# *.zip                  # Archivos comprimidos
+# *.tar
+# *.gz
+# *.7z
+# *.bak                  # Archivos de respaldo
+# *.swp                  # Archivos temporales de editores
+# *.tmp                  # Archivos temporales
