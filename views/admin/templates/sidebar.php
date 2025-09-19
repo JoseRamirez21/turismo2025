@@ -48,7 +48,13 @@
         <i class="bi bi-person-lines-fill me-2"></i> Administradores
       </a>
     </li>
-  </ul>
+  <li class="nav-item mb-2">
+  <a href="<?= BASE_URL ?>/views/client_api/index.php"
+     class="nav-link text-white <?= strpos($_SERVER['PHP_SELF'],'client_api')!==false ? 'active' : '' ?>">
+    <i class="bi bi-people-fill me-2"></i> Clientes API
+  </a>
+</li>
+
 
   <!-- Logout abajo -->
   <div class="mt-auto">
