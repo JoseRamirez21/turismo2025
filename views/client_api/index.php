@@ -58,6 +58,7 @@ require view_path('views/admin/templates/topbar.php');
                        title="Editar">
                       <i class="bi bi-pencil-fill text-primary"></i>
                     </a>
+                    
                     <a href="#" 
                        class="btn btn-sm btn-light shadow-sm icon-btn"
                        data-bs-toggle="modal" 

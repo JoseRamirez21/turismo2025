@@ -54,6 +54,13 @@
     <i class="bi bi-people-fill me-2"></i> Clientes API
   </a>
 </li>
+<li class="nav-item mb-2">
+  <a href="<?= BASE_URL ?>/views/tokens_api/index.php"
+     class="nav-link text-white <?= strpos($_SERVER['PHP_SELF'],'tokens_api')!==false ? 'active' : '' ?>">
+    <i class="bi bi-key me-2"></i> Tokens API
+  </a>
+</li>
+
 
 
   <!-- Logout abajo -->
