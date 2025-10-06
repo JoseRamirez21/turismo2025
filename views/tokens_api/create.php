@@ -18,27 +18,25 @@ $clientController = new ClientApiController($pdo);
 $clients = $clientController->index();
 
 $errors = [];
-$success = false;
 
 // Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_client_api = trim($_POST['id_client_api'] ?? '');
-    $token         = trim($_POST['token'] ?? '');
     $estado        = $_POST['estado'] ?? 1;
 
     // Validación
     if (empty($id_client_api)) {
         $errors[] = "Debe seleccionar un cliente.";
     }
-    if (empty($token)) {
-        $errors[] = "El campo Token es obligatorio.";
-    }
 
-    // Guardar si no hay errores
     if (empty($errors)) {
+        // Generar token automáticamente
+        $randomToken = bin2hex(random_bytes(16)); // 32 caracteres aleatorios
+        $tokenGenerado = $randomToken . '-' . $id_client_api; // token + ID cliente
+
         $data = [
             'id_client_api' => $id_client_api,
-            'token'         => $token,
+            'token'         => $tokenGenerado,
             'estado'        => $estado
         ];
 
@@ -70,7 +68,7 @@ require view_path('views/admin/templates/topbar.php');
         <h2 class="fw-bold text-primary">
           <i class="bi bi-plus-circle-fill me-2"></i> Nuevo Token API
         </h2>
-        <a href="index.php" class="btn btn-secondary btn-sm shadow-sm">
+        <a href="index.php" class="btn btn-warning btn-sm shadow-sm">
           <i class="bi bi-arrow-left"></i> Volver
         </a>
       </div>
@@ -106,16 +104,6 @@ require view_path('views/admin/templates/topbar.php');
               </select>
             </div>
 
-            <!-- Token -->
-            <div class="mb-3">
-              <label for="token" class="form-label fw-semibold">
-                <i class="bi bi-key me-1"></i> Token
-              </label>
-              <input type="text" name="token" id="token" class="form-control" 
-                     placeholder="Ej. 7f8d9a2b..." required
-                     value="<?= htmlspecialchars($_POST['token'] ?? '') ?>">
-            </div>
-
             <!-- Estado -->
             <div class="mb-3">
               <label for="estado" class="form-label fw-semibold">
@@ -129,9 +117,12 @@ require view_path('views/admin/templates/topbar.php');
 
             <!-- Botones -->
             <div class="d-flex justify-content-end mt-4">
-              <button type="submit" class="btn btn-primary shadow-sm">
+              <button type="submit" class="btn btn-primary shadow-sm me-2">
                 <i class="bi bi-save"></i> Guardar
               </button>
+              <a href="index.php" class="btn btn-outline-danger shadow-sm">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
             </div>
 
           </form>

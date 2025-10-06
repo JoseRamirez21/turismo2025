@@ -2,6 +2,7 @@
 // controllers/LugarController.php
 require_once __DIR__ . '/../models/Lugar.php';
 require_once __DIR__ . '/../models/Distrito.php';
+require_once __DIR__ . '/../config/cors.php';
 
 class LugarController {
     private $lugarModel;

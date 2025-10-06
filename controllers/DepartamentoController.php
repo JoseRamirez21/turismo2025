@@ -1,6 +1,7 @@
 <?php
 // controllers/DepartamentoController.php
 require_once __DIR__ . '/../models/Departamento.php';
+require_once __DIR__ . '/../config/cors.php';
 
 class DepartamentoController {
     private $model;

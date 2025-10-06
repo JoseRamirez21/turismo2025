@@ -1,6 +1,7 @@
 <?php
 // controllers/AjaxController.php
 require_once __DIR__ . '/../models/Provincia.php';
+require_once __DIR__ . '/../config/cors.php';
 
 header('Content-Type: application/json');
 

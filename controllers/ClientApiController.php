@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/ClientApi.php';
+require_once __DIR__ . '/../config/cors.php';
 
 class ClientApiController {
     private $model;

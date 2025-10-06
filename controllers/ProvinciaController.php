@@ -2,6 +2,7 @@
 // controllers/ProvinciaController.php
 require_once __DIR__ . '/../models/Provincia.php';
 require_once __DIR__ . '/../models/Departamento.php';
+require_once __DIR__ . '/../config/cors.php';
 
 class ProvinciaController {
     private $provinciaModel;

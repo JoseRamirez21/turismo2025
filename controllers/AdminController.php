@@ -1,6 +1,8 @@
 <?php
 // controllers/AdminController.php
 require_once __DIR__ . '/../models/Admin.php';
+require_once __DIR__ . '/../config/cors.php';
+
 
 class AdminController {
     private $model;

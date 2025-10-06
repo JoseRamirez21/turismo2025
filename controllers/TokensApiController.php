@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/TokensApi.php';
+require_once __DIR__ . '/../config/cors.php';
 
 class TokensApiController {
     private $model;
@@ -8,28 +9,33 @@ class TokensApiController {
         $this->model = new TokensApi($pdo);
     }
 
-    // Obtener todos los tokens
+    // ✅ Listar todos
     public function index() {
         return $this->model->getAll();
     }
 
-    // Crear un token
+    // ✅ Crear
     public function create(array $data) {
         return $this->model->create($data);
     }
 
-    // Actualizar un token
+    // ✅ Actualizar
     public function update($id, array $data) {
         return $this->model->update($id, $data);
     }
 
-    // Eliminar un token
+    // ✅ Eliminar
     public function destroy($id) {
         return $this->model->delete($id);
     }
 
-    // ✅ Obtener un token por ID
+    // ✅ Obtener por ID (este es el que se usa en edit.php)
     public function getTokenById($id) {
         return $this->model->getById($id);
+    }
+
+    // ✅ Regenerar token
+    public function regenerateToken($id) {
+        return $this->model->regenerateToken($id);
     }
 }
