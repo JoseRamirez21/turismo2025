@@ -11,7 +11,7 @@ $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' :
 $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 // Cambia esto por la carpeta de tu proyecto en htdocs
-$projectFolder = '/turismo2025-2';
+$projectFolder = '/turismo_2025';
 define('BASE_URL', $scheme . '://' . $host . $projectFolder);
 
 // URL de la API (para hosting)

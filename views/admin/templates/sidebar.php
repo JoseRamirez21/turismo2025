@@ -60,6 +60,12 @@
     <i class="bi bi-key me-2"></i> Tokens API
   </a>
 </li>
+<li class="nav-item mb-2">
+  <a href="<?= BASE_URL ?>/views/count_request/index.php"
+     class="nav-link text-white <?= strpos($_SERVER['PHP_SELF'],'count_request')!==false ? 'active' : '' ?>">
+    <i class="bi bi-graph-up me-2"></i> Count Request
+  </a>
+</li>
 
 
 
