@@ -21,38 +21,40 @@ require_once view_path('views/templates/navbar.php');
 
 <script>
 function validarToken() {
-  const token = document.getElementById("token").value.trim();
+  const token = document.getElementById("token").value.trim(); //verifica el token
   const resultado = document.getElementById("resultado");
   resultado.className = "mt-3 fw-bold";
 
   if (token === "") {
-    resultado.innerHTML = "⚠️ Debes ingresar un token.";
+    resultado.innerHTML = "⚠️ Debes ingresar un token."; //verificacion inicial
     resultado.classList.add('text-danger');
     return;
   }
 
-  fetch('../../api/tokens.php?action=validate', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: 'token=' + encodeURIComponent(token)
-  })
+fetch('../../api/tokens.php?action=validate', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'}, //validacion de token
+  body: JSON.stringify({ token })
+})
+
+
   .then(res => {
     if (!res.ok) throw new Error('Error al conectar con la API');
     return res.json();
   })
-  .then(data => {
+  .then(data => {                
     if (data.status === 'success') {
       resultado.innerHTML = "✅ Token válido. Redirigiendo...";
       resultado.classList.remove('text-danger');
       resultado.classList.add('text-success');
-      setTimeout(() => window.location.href = '../admin/dashboard.php', 1500);
+      setTimeout(() => window.location.href = '../admin/dashboard.php', 1500);//Si el token es válido → muestra un mensaje y redirige al dashboard
     } else {
-      resultado.innerHTML = "❌ Token inválido o expirado.";
+      resultado.innerHTML = "❌ Token inválido o expirado.";//  Si es inválido → muestra un error.
       resultado.classList.add('text-danger');
     }
   })
   .catch(err => {
-    resultado.innerHTML = "⚠️ Error: " + err.message;
+    resultado.innerHTML = "⚠️ Error: " + err.message; //Capturalos errores de las API y lo muestra en la interfaz
     resultado.classList.add('text-danger');
   });
 }

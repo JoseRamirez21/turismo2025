@@ -1,15 +1,18 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
-if (!isset($_SESSION['admin_id'])) {
+// ✅ Si no hay sesión de admin_id ni token validado, redirigir
+if (
+    !isset($_SESSION['admin_id']) &&
+    (!isset($_SESSION['admin_autenticado']) || $_SESSION['admin_autenticado'] !== true)
+) {
     header('Location: ' . BASE_URL . '/views/admin/login.php');
     exit;
 }
 
+// ✅ Establecer nombre del admin
 $adminNombre = $_SESSION['admin_nombre'] ?? 'Administrador';
 $pageTitle   = "Panel de Control";
 
@@ -24,7 +27,6 @@ $provinciaController    = new ProvinciaController();
 $distritoController     = new DistritoController();
 $lugarController        = new LugarController();
 
-// === Totales desde BD ===
 $totalDepartamentos = $departamentoController->count('');
 $totalProvincias    = $provinciaController->count('');
 $totalDistritos     = $distritoController->count('');
@@ -33,6 +35,7 @@ $totalLugares       = $lugarController->count('');
 require view_path('views/admin/templates/header.php');
 require view_path('views/admin/templates/topbar.php');
 ?>
+
 
 <div class="container-fluid">
   <div class="row">

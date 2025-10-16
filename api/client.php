@@ -1,5 +1,4 @@
 <?php
-// /api/client.php
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/ClientApiController.php';
@@ -11,7 +10,7 @@ $controller = new ClientApiController($pdo);
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         if (isset($_GET['id'])) {
-            $data = $controller->getById($_GET['id']);
+            $data = $controller->find($_GET['id']);  // ✅ cambiar getById() → find()
         } else {
             $data = $controller->index();
         }
@@ -27,13 +26,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'PUT':
         $id = $_GET['id'] ?? null;
         $input = json_decode(file_get_contents('php://input'), true);
-        $result = $controller->update($id, $input);
+        $result = $controller->edit($id, $input);  // ✅ cambiar update() → edit()
         echo json_encode(['success' => $result]);
         break;
 
     case 'DELETE':
         $id = $_GET['id'] ?? null;
-        $result = $controller->destroy($id);
+        $result = $controller->delete($id);  // ✅ cambiar destroy() → delete()
         echo json_encode(['success' => $result]);
         break;
 }
+

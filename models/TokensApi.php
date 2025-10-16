@@ -147,8 +147,9 @@ class TokensApi {
     }
 
     // 📌 Validar token (solo tokens activos)
-    public function validarToken($token)
-    {
+public function validarToken($token)
+{
+    try {
         $query = "SELECT * FROM tokens_api WHERE token = :token AND estado = 'activo' LIMIT 1";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':token', $token);
@@ -157,15 +158,23 @@ class TokensApi {
 
         if ($tokenData) {
             return [
-                'status' => 'success',
-                'message' => 'Token válido',
+                'success' => true,
+                'message' => '✅ Token válido',
                 'data' => $tokenData
             ];
         } else {
             return [
-                'status' => 'error',
-                'message' => 'Token inválido o inactivo'
+                'success' => false,
+                'message' => '❌ Token inválido o inactivo'
             ];
         }
+    } catch (PDOException $e) {
+        error_log("❌ Error al validar token: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error al validar token'
+        ];
     }
+}
+
 }
