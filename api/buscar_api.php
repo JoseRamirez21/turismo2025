@@ -9,7 +9,6 @@ $input = json_decode(file_get_contents('php://input'), true);
 $token   = isset($input['token']) ? trim($input['token']) : '';
 $termino = isset($input['dato']) ? trim($input['dato']) : '';
 
-// Validar token
 if (empty($token)) {
     echo json_encode(['status' => 'error', 'message' => '❌ Token no proporcionado.']);
     exit;
@@ -26,7 +25,80 @@ if (empty($termino)) {
     exit;
 }
 
-// Función para obtener lugares turísticos
+// Función para obtener departamentos
+function obtenerDepartamentos() {
+    $urlDep = 'http://localhost/turismo_2025/views/admin/departamentos/listar.php';
+    $htmlDep = file_get_contents($urlDep);
+    if (!$htmlDep) return [];
+
+    $docDep = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $docDep->loadHTML($htmlDep);
+    libxml_clear_errors();
+
+    $xpathDep = new DOMXPath($docDep);
+    $departamentos = [];
+    foreach ($xpathDep->query("//table/tbody/tr") as $tr) {
+        $tds = $xpathDep->query("td", $tr);
+        if ($tds->length < 2) continue; // corregido
+
+        // Extraer solo el texto visible del td
+        $nombreNode = $xpathDep->query("text()", $tds->item(1));
+        $departamentos[] = trim($nombreNode->item(0)->nodeValue ?? '');
+    }
+    return $departamentos;
+}
+
+// Función para obtener provincias
+function obtenerProvincias() {
+    $urlProv = 'http://localhost/turismo_2025/views/admin/provincias/listar.php';
+    $htmlProv = file_get_contents($urlProv);
+    if (!$htmlProv) return [];
+
+    $docProv = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $docProv->loadHTML($htmlProv);
+    libxml_clear_errors();
+
+    $xpathProv = new DOMXPath($docProv);
+    $provincias = [];
+    foreach ($xpathProv->query("//table/tbody/tr") as $tr) {
+        $tds = $xpathProv->query("td", $tr);
+        if ($tds->length < 3) continue;
+        $provincias[] = [
+            'provincia' => trim($tds->item(1)->textContent ?? ''),
+            'departamento' => trim($tds->item(2)->textContent ?? '')
+        ];
+    }
+    return $provincias;
+}
+
+// Función para obtener distritos
+function obtenerDistritos() {
+    $urlDist = 'http://localhost/turismo_2025/views/admin/distritos/listar.php';
+    $htmlDist = file_get_contents($urlDist);
+    if (!$htmlDist) return [];
+
+    $docDist = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $docDist->loadHTML($htmlDist);
+    libxml_clear_errors();
+
+    $xpathDist = new DOMXPath($docDist);
+    $distritos = [];
+    foreach ($xpathDist->query("//table/tbody/tr") as $tr) {
+        $tds = $xpathDist->query("td", $tr);
+        if ($tds->length < 4) continue;
+        $distritos[] = [
+            'distrito' => trim($tds->item(1)->textContent ?? ''),
+            'provincia' => trim($tds->item(2)->textContent ?? ''),
+            'departamento' => trim($tds->item(3)->textContent ?? '')
+        ];
+    }
+    return $distritos;
+}
+
+// Función para obtener lugares turísticos filtrados
 function obtenerLugares($termino) {
     $urlLugares = 'http://localhost/turismo_2025/views/admin/lugares/listar.php';
     $htmlLug = file_get_contents($urlLugares);
@@ -40,9 +112,9 @@ function obtenerLugares($termino) {
     $xpathLug = new DOMXPath($docLug);
     $lugares = [];
 
-    foreach ($xpathLug->query("//table/tbody/tr") as $tr) {
-        if (!($tr instanceof DOMElement)) continue;
+    $distritos = obtenerDistritos();
 
+    foreach ($xpathLug->query("//table/tbody/tr") as $tr) {
         $tds = $xpathLug->query("td", $tr);
         if ($tds->length < 4) continue;
 
@@ -50,15 +122,31 @@ function obtenerLugares($termino) {
         $tipo     = trim($tds->item(2)->textContent ?? '');
         $distrito = trim($tds->item(3)->textContent ?? '');
 
-        // Filtrar por término
-        if (stripos($nombre, $termino) !== false
-            || stripos($tipo, $termino) !== false
-            || stripos($distrito, $termino) !== false) {
+        // Buscar ubicación del distrito
+        $provincia = $departamento = '—';
+        foreach ($distritos as $dist) {
+            if (mb_strtolower($dist['distrito']) === mb_strtolower($distrito)) {
+                $provincia = $dist['provincia'];
+                $departamento = $dist['departamento'];
+                break;
+            }
+        }
 
+        // Filtrar por jerarquía incluyendo departamento
+        if (
+            mb_stripos($nombre, $termino) !== false ||
+            mb_stripos($tipo, $termino) !== false ||
+            mb_stripos($distrito, $termino) !== false ||
+            mb_stripos($provincia, $termino) !== false ||
+            mb_stripos($departamento, $termino) !== false
+        ) {
             $lugares[] = [
                 'nombre' => $nombre,
                 'tipo' => $tipo,
                 'distrito' => $distrito,
+                'provincia' => $provincia,
+                'departamento' => $departamento,
+                'imagen' => 'https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg'
             ];
         }
     }
@@ -66,46 +154,7 @@ function obtenerLugares($termino) {
     return $lugares;
 }
 
-// Función para obtener provincia y departamento desde distritos
-function obtenerUbicacion($distrito) {
-    $urlDist = 'http://localhost/turismo_2025/views/admin/distritos/listar.php';
-    $htmlDist = file_get_contents($urlDist);
-    if (!$htmlDist) return ['provincia'=>'—', 'departamento'=>'—'];
-
-    $docDist = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $docDist->loadHTML($htmlDist);
-    libxml_clear_errors();
-
-    $xpathDist = new DOMXPath($docDist);
-
-    foreach ($xpathDist->query("//table/tbody/tr") as $tr) {
-        if (!($tr instanceof DOMElement)) continue;
-
-        $tds = $xpathDist->query("td", $tr);
-        if ($tds->length < 4) continue;
-
-        $dist = trim($tds->item(1)->textContent ?? '');
-        $prov = trim($tds->item(2)->textContent ?? '');
-        $dep  = trim($tds->item(3)->textContent ?? '');
-
-        if (strcasecmp($dist, $distrito) === 0) {
-            return ['provincia'=>$prov, 'departamento'=>$dep];
-        }
-    }
-
-    return ['provincia'=>'—', 'departamento'=>'—'];
-}
-
 $lugares = obtenerLugares($termino);
-
-// Agregar provincia, departamento e imagen de prueba
-foreach ($lugares as &$lugar) {
-    $ubic = obtenerUbicacion($lugar['distrito']);
-    $lugar['provincia'] = $ubic['provincia'];
-    $lugar['departamento'] = $ubic['departamento'];
-    $lugar['imagen'] = 'https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg'; // prueba
-}
 
 echo json_encode(!empty($lugares) ? [
     'status' => 'success',
