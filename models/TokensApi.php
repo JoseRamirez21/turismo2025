@@ -150,7 +150,7 @@ class TokensApi {
 public function validarToken($token)
 {
     try {
-        $query = "SELECT * FROM tokens_api WHERE token = :token AND estado = 'activo' LIMIT 1";
+       $query = "SELECT * FROM tokens_api WHERE token = :token AND estado = 1 LIMIT 1";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':token', $token);
         $stmt->execute();

@@ -1,14 +1,22 @@
 <?php
-require_once __DIR__ . '/../models/TokenModel.php';
+require_once __DIR__ . '/../models/TokensApi.php';
+require_once __DIR__ . '/../config/config.php';
 
+$tokenModel = new TokensApi($pdo);
+
+// Recibir datos desde JSON
 $input = json_decode(file_get_contents('php://input'), true);
 $token   = isset($input['token']) ? trim($input['token']) : '';
 $termino = isset($input['dato']) ? trim($input['dato']) : '';
 
-$tokenModel = new TokenModel();
-
 // Validar token
-if (!$token || !$tokenModel->validarToken($token)) {
+if (empty($token)) {
+    echo json_encode(['status' => 'error', 'message' => '❌ Token no proporcionado.']);
+    exit;
+}
+
+$resultado = $tokenModel->validarToken($token);
+if (empty($resultado['success']) || $resultado['success'] !== true) {
     echo json_encode(['status' => 'error', 'message' => '❌ Token inválido o inactivo.']);
     exit;
 }
@@ -18,9 +26,9 @@ if (empty($termino)) {
     exit;
 }
 
-// Función para jalar datos desde la página
-function obtenerLugaresDesdePagina($termino) {
-    $url = 'http://localhost/turismo_2025/views/admin/lugares/listar.php'; // página que contiene los lugares
+// Función para obtener lugares
+function obtenerLugares($termino) {
+    $url = 'http://localhost/turismo_2025/views/admin/lugares/listar.php';
     $html = file_get_contents($url);
 
     if (!$html) return [];
@@ -33,24 +41,27 @@ function obtenerLugaresDesdePagina($termino) {
     $xpath = new DOMXPath($doc);
     $lugares = [];
 
-    // Aquí dependemos de la estructura HTML de index.php
-    // Por ejemplo, si cada lugar está en un div con clase 'lugar-turistico'
-    foreach ($xpath->query("//div[contains(@class,'lugar-turistico')]") as $div) {
-        $nombre = $xpath->query(".//h5", $div)->item(0)?->textContent ?? '';
-        $tipo = $xpath->query(".//p[@class='tipo']", $div)->item(0)?->textContent ?? '';
-        $descripcion = $xpath->query(".//p[@class='descripcion']", $div)->item(0)?->textContent ?? '';
-        $ubicacion = $xpath->query(".//p[@class='ubicacion']", $div)->item(0)?->textContent ?? '';
+    foreach ($xpath->query("//table/tbody/tr") as $tr) {
+        if (!($tr instanceof DOMElement)) continue;
 
-        // Filtrar por término (ignora mayúsculas/minúsculas)
-        if (stripos($nombre, $termino) !== false
+        $tds = $tr->getElementsByTagName('td');
+        if ($tds->length < 4) continue;
+
+        $id_lugar = trim($tds->item(0)->textContent ?? '');
+        $nombre   = trim($tds->item(1)->textContent ?? '');
+        $tipo     = trim($tds->item(2)->textContent ?? '');
+        $distrito = trim($tds->item(3)->textContent ?? '');
+
+        // Filtrar por término
+        if (stripos($id_lugar, $termino) !== false
+            || stripos($nombre, $termino) !== false
             || stripos($tipo, $termino) !== false
-            || stripos($descripcion, $termino) !== false
-            || stripos($ubicacion, $termino) !== false) {
+            || stripos($distrito, $termino) !== false) {
             $lugares[] = [
-                'lugar' => trim($nombre),
-                'tipo' => trim($tipo),
-                'descripcion' => trim($descripcion),
-                'ubicacion' => trim($ubicacion),
+                'id_lugar' => $id_lugar,
+                'nombre'   => $nombre,
+                'tipo'     => $tipo,
+                'distrito' => $distrito,
             ];
         }
     }
@@ -58,7 +69,7 @@ function obtenerLugaresDesdePagina($termino) {
     return $lugares;
 }
 
-$resultados = obtenerLugaresDesdePagina($termino);
+$resultados = obtenerLugares($termino);
 
 echo json_encode(!empty($resultados) ? [
     'status' => 'success',

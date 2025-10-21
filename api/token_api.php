@@ -1,13 +1,15 @@
 <?php
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../models/TokenModel.php';
+require_once __DIR__ . '/../models/TokensApi.php'; // ✅ nombre correcto
+require_once __DIR__ . '/../config/config.php';    // ✅ para usar $pdo
 
-$tokenModel = new TokenModel();
+$tokenModel = new TokensApi($pdo); // ✅ clase correcta
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Recibir token enviado (para validar)
     $token = $_POST['token'] ?? '';
+
 
     if (empty($token)) {
         echo json_encode([
@@ -18,7 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validar token
-    if ($tokenModel->validarToken($token)) {
+    $resultado = $tokenModel->validarToken($token);
+
+    if (!empty($resultado['success']) && $resultado['success'] === true) {
         echo json_encode([
             'status' => 'success',
             'message' => '✅ Token válido y activo.'
@@ -32,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Opcional: devolver todos los tokens activos (solo para pruebas)
-    $tokens = $tokenModel->obtenerTokensActivos();
+    $tokens = $tokenModel->getAll();
     echo json_encode([
         'status' => 'success',
         'data' => $tokens
@@ -43,4 +47,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'message' => 'Método no permitido. Use POST o GET.'
     ]);
 }
-
