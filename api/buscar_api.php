@@ -26,11 +26,10 @@ if (empty($termino)) {
     exit;
 }
 
-// Función para obtener lugares
+// Función para obtener datos desde listar.php
 function obtenerLugares($termino) {
     $url = 'http://localhost/turismo_2025/views/admin/lugares/listar.php';
     $html = file_get_contents($url);
-
     if (!$html) return [];
 
     $doc = new DOMDocument();
@@ -47,18 +46,15 @@ function obtenerLugares($termino) {
         $tds = $tr->getElementsByTagName('td');
         if ($tds->length < 4) continue;
 
-        $id_lugar = trim($tds->item(0)->textContent ?? '');
         $nombre   = trim($tds->item(1)->textContent ?? '');
         $tipo     = trim($tds->item(2)->textContent ?? '');
         $distrito = trim($tds->item(3)->textContent ?? '');
 
         // Filtrar por término
-        if (stripos($id_lugar, $termino) !== false
-            || stripos($nombre, $termino) !== false
+        if (stripos($nombre, $termino) !== false
             || stripos($tipo, $termino) !== false
             || stripos($distrito, $termino) !== false) {
             $lugares[] = [
-                'id_lugar' => $id_lugar,
                 'nombre'   => $nombre,
                 'tipo'     => $tipo,
                 'distrito' => $distrito,

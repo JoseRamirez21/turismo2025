@@ -9,12 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const urlApi = document.getElementById("url_api").value.trim();
         const dato = document.getElementById("dato").value.trim();
 
-        if (!token || !urlApi || !dato) {
+        if (!token || !dato) {
             Swal.fire({
                 icon: "warning",
                 title: "Campos vacíos",
                 text: "Por favor completa todos los campos.",
-                confirmButtonColor: "#3085d6"
             });
             return;
         }
@@ -29,39 +28,33 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             resultadosDiv.innerHTML = "";
 
-            if (data.status !== "success" || !data.data || data.data.length === 0) {
+            if (data.status === "error") {
+                Swal.fire({ icon: "error", title: "Error", text: data.message });
+                return;
+            } 
+
+            if (data.status === "warning" || data.status === "info" || !data.data || data.data.length === 0) {
                 resultadosDiv.innerHTML = `<div class="alert alert-warning text-center mt-4">
                     ⚠️ No se encontraron resultados para <b>${dato}</b>.
                 </div>`;
                 return;
             }
 
-            // Mostrar solo id, nombre, tipo y distrito
-            let html = `<div class="table-responsive mt-4">
-                <table class="table table-striped table-hover text-center align-middle shadow-sm">
-                    <thead class="table-primary text-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Distrito</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-            data.data.forEach((item, i) => {
-                html += `<tr>
-                    <td>${i + 1}</td>
-                    <td>${item.id_lugar}</td>
-                    <td>${item.nombre}</td>
-                    <td>${item.tipo || "Sin tipo"}</td>
-                    <td>${item.distrito || "—"}</td>
-                </tr>`;
+            // Mostrar resultados en cards
+            let html = '';
+            data.data.forEach(item => {
+                html += `
+                    <div class="col-md-4">
+                        <div class="card-lugar p-3">
+                            <h5 class="fw-bold text-primary">${item.nombre}</h5>
+                            <p class="mb-1"><strong>Tipo:</strong> ${item.tipo || "Sin tipo"}</p>
+                            <p class="mb-0"><strong>Distrito:</strong> ${item.distrito || "—"}</p>
+                        </div>
+                    </div>
+                `;
             });
 
-            html += `</tbody></table></div>`;
-            resultadosDiv.innerHTML = html;
+            resultadosDiv.innerHTML = `<div class="row g-3">${html}</div>`;
 
         } catch (err) {
             console.error(err);
