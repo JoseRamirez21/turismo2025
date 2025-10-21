@@ -26,24 +26,24 @@ if (empty($termino)) {
     exit;
 }
 
-// Función para obtener datos desde listar.php
+// Función para obtener lugares turísticos
 function obtenerLugares($termino) {
-    $url = 'http://localhost/turismo_2025/views/admin/lugares/listar.php';
-    $html = file_get_contents($url);
-    if (!$html) return [];
+    $urlLugares = 'http://localhost/turismo_2025/views/admin/lugares/listar.php';
+    $htmlLug = file_get_contents($urlLugares);
+    if (!$htmlLug) return [];
 
-    $doc = new DOMDocument();
+    $docLug = new DOMDocument();
     libxml_use_internal_errors(true);
-    $doc->loadHTML($html);
+    $docLug->loadHTML($htmlLug);
     libxml_clear_errors();
 
-    $xpath = new DOMXPath($doc);
+    $xpathLug = new DOMXPath($docLug);
     $lugares = [];
 
-    foreach ($xpath->query("//table/tbody/tr") as $tr) {
+    foreach ($xpathLug->query("//table/tbody/tr") as $tr) {
         if (!($tr instanceof DOMElement)) continue;
 
-        $tds = $tr->getElementsByTagName('td');
+        $tds = $xpathLug->query("td", $tr);
         if ($tds->length < 4) continue;
 
         $nombre   = trim($tds->item(1)->textContent ?? '');
@@ -54,9 +54,10 @@ function obtenerLugares($termino) {
         if (stripos($nombre, $termino) !== false
             || stripos($tipo, $termino) !== false
             || stripos($distrito, $termino) !== false) {
+
             $lugares[] = [
-                'nombre'   => $nombre,
-                'tipo'     => $tipo,
+                'nombre' => $nombre,
+                'tipo' => $tipo,
                 'distrito' => $distrito,
             ];
         }
@@ -65,12 +66,51 @@ function obtenerLugares($termino) {
     return $lugares;
 }
 
-$resultados = obtenerLugares($termino);
+// Función para obtener provincia y departamento desde distritos
+function obtenerUbicacion($distrito) {
+    $urlDist = 'http://localhost/turismo_2025/views/admin/distritos/listar.php';
+    $htmlDist = file_get_contents($urlDist);
+    if (!$htmlDist) return ['provincia'=>'—', 'departamento'=>'—'];
 
-echo json_encode(!empty($resultados) ? [
+    $docDist = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $docDist->loadHTML($htmlDist);
+    libxml_clear_errors();
+
+    $xpathDist = new DOMXPath($docDist);
+
+    foreach ($xpathDist->query("//table/tbody/tr") as $tr) {
+        if (!($tr instanceof DOMElement)) continue;
+
+        $tds = $xpathDist->query("td", $tr);
+        if ($tds->length < 4) continue;
+
+        $dist = trim($tds->item(1)->textContent ?? '');
+        $prov = trim($tds->item(2)->textContent ?? '');
+        $dep  = trim($tds->item(3)->textContent ?? '');
+
+        if (strcasecmp($dist, $distrito) === 0) {
+            return ['provincia'=>$prov, 'departamento'=>$dep];
+        }
+    }
+
+    return ['provincia'=>'—', 'departamento'=>'—'];
+}
+
+$lugares = obtenerLugares($termino);
+
+// Agregar provincia, departamento e imagen de prueba
+foreach ($lugares as &$lugar) {
+    $ubic = obtenerUbicacion($lugar['distrito']);
+    $lugar['provincia'] = $ubic['provincia'];
+    $lugar['departamento'] = $ubic['departamento'];
+    $lugar['imagen'] = 'https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg'; // prueba
+}
+
+echo json_encode(!empty($lugares) ? [
     'status' => 'success',
     'message' => '✅ Resultados encontrados.',
-    'data' => $resultados
+    'data' => $lugares
 ] : [
     'status' => 'info',
     'message' => '⚠️ No se encontraron resultados.'

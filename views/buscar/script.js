@@ -1,19 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formBusqueda");
     const resultadosDiv = document.getElementById("resultados");
+    const imagenPrueba = "https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg";
+
+    if (!form || !resultadosDiv) return;
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const token = document.getElementById("token").value.trim();
-        const urlApi = document.getElementById("url_api").value.trim();
-        const dato = document.getElementById("dato").value.trim();
+        const token = document.getElementById("token")?.value.trim();
+        const urlApi = document.getElementById("url_api")?.value.trim();
+        const dato = document.getElementById("dato")?.value.trim();
 
-        if (!token || !dato) {
+        if (!token || !urlApi || !dato) {
             Swal.fire({
                 icon: "warning",
                 title: "Campos vacíos",
                 text: "Por favor completa todos los campos.",
+                confirmButtonColor: "#3085d6"
             });
             return;
         }
@@ -28,33 +32,46 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             resultadosDiv.innerHTML = "";
 
-            if (data.status === "error") {
-                Swal.fire({ icon: "error", title: "Error", text: data.message });
-                return;
-            } 
-
-            if (data.status === "warning" || data.status === "info" || !data.data || data.data.length === 0) {
+            if (data.status !== "success" || !data.data || data.data.length === 0) {
                 resultadosDiv.innerHTML = `<div class="alert alert-warning text-center mt-4">
                     ⚠️ No se encontraron resultados para <b>${dato}</b>.
                 </div>`;
                 return;
             }
 
-            // Mostrar resultados en cards
-            let html = '';
+            // Ajustar flexbox según cantidad de tarjetas
+            const cardsContainer = document.createElement("div");
+            cardsContainer.style.display = "flex";
+            cardsContainer.style.flexWrap = "wrap";
+            cardsContainer.style.gap = "20px";
+
+            // Centrar cuando hay pocas tarjetas
+            if (data.data.length <= 2) {
+                cardsContainer.style.justifyContent = "center";
+            } else {
+                cardsContainer.style.justifyContent = "flex-start";
+            }
+
             data.data.forEach(item => {
-                html += `
-                    <div class="col-md-4">
-                        <div class="card-lugar p-3">
-                            <h5 class="fw-bold text-primary">${item.nombre}</h5>
-                            <p class="mb-1"><strong>Tipo:</strong> ${item.tipo || "Sin tipo"}</p>
-                            <p class="mb-0"><strong>Distrito:</strong> ${item.distrito || "—"}</p>
+                const cardWrapper = document.createElement("div");
+                cardWrapper.className = "card-wrapper";
+
+                cardWrapper.innerHTML = `
+                    <div class="card shadow-sm h-100">
+                        <img src="${imagenPrueba}" class="card-img-top" alt="${item.nombre}">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary fw-bold">${item.nombre}</h5>
+                            <p class="card-text"><strong>Tipo:</strong> ${item.tipo || "Sin tipo"}</p>
+                            <p class="card-text"><strong>Distrito:</strong> ${item.distrito || "—"}</p>
+                            <p class="card-text"><strong>Provincia:</strong> ${item.provincia || "—"}</p>
+                            <p class="card-text"><strong>Departamento:</strong> ${item.departamento || "—"}</p>
                         </div>
                     </div>
                 `;
+                cardsContainer.appendChild(cardWrapper);
             });
 
-            resultadosDiv.innerHTML = `<div class="row g-3">${html}</div>`;
+            resultadosDiv.appendChild(cardsContainer);
 
         } catch (err) {
             console.error(err);
