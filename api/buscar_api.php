@@ -75,7 +75,6 @@ function obtenerProvincias() {
 }
 
 // Función para obtener distritos
-// Función para obtener distritos de todas las páginas
 function obtenerDistritos() {
     $urlsDist = [
         'http://localhost/turismo_2025/views/admin/distritos/listar.php',
@@ -113,7 +112,6 @@ function obtenerDistritos() {
 
     return $distritos;
 }
-
 
 // Función para realizar la solicitud con cURL
 function obtenerPaginaConCurl($url) {

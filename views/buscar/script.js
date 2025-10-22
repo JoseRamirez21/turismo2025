@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         const token = document.getElementById("token")?.value.trim();
-        const urlApiBase = document.getElementById("url_api")?.value.trim(); // Base URL de la API
+        const urlApi = document.getElementById("url_api")?.value.trim();
         const dato = document.getElementById("dato")?.value.trim();
 
-        if (!token || !urlApiBase || !dato) {
+        if (!token || !urlApi || !dato) {
             Swal.fire({
                 icon: "warning",
                 title: "Campos vacíos",
@@ -22,8 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Actualiza el URL de la API con el término de búsqueda
-        const urlApi = `${urlApiBase}?token=${token}&dato=${dato}`; // Asumimos que el URL API espera esos parámetros
+        // Cambiar la URL de la barra de direcciones sin recargar la página
+        const newUrl = `${window.location.pathname}?token=${encodeURIComponent(token)}&dato=${encodeURIComponent(dato)}`;
+        window.history.pushState({ path: newUrl }, "", newUrl);
 
         try {
             const response = await fetch(urlApi, {
