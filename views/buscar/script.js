@@ -23,16 +23,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch(urlApi, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, dato })
-            });
+            let allResults = []; // Aquí guardaremos todos los resultados únicos
+            for (let page = 1; page <= 8; page++) { // Recorremos las 8 páginas
+                const url = `${urlApi}?page=${page}&limit=20&search=${dato}`;
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token, dato })
+                });
 
-            const data = await response.json();
-            resultadosDiv.innerHTML = "";
+                const data = await response.json();
 
-            if (data.status !== "success" || !data.data || data.data.length === 0) {
+                // Si no se encuentran resultados, salimos del ciclo
+                if (data.status !== "success" || !data.data || data.data.length === 0) {
+                    break;
+                }
+
+                // Agregar los resultados de esta página a la lista total, asegurándonos de no duplicar
+                data.data.forEach(item => {
+                    if (!allResults.some(existingItem => existingItem.nombre === item.nombre)) {
+                        allResults.push(item);
+                    }
+                });
+            }
+
+            // Aseguramos que los resultados se muestren al contenedor
+            resultadosDiv.innerHTML = ""; // Limpiamos el contenedor para mostrar los nuevos resultados
+            if (allResults.length === 0) {
                 resultadosDiv.innerHTML = `<div class="alert alert-warning text-center mt-4">
                     ⚠️ No se encontraron resultados para <b>${dato}</b>.
                 </div>`;
@@ -46,13 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
             cardsContainer.style.gap = "20px";
 
             // Centrar cuando hay pocas tarjetas
-            if (data.data.length <= 2) {
+            if (allResults.length <= 2) {
                 cardsContainer.style.justifyContent = "center";
             } else {
                 cardsContainer.style.justifyContent = "flex-start";
             }
 
-            data.data.forEach(item => {
+            allResults.forEach(item => {
                 const cardWrapper = document.createElement("div");
                 cardWrapper.className = "card-wrapper";
 
@@ -71,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cardsContainer.appendChild(cardWrapper);
             });
 
+            // Finalmente, agregamos todos los resultados al contenedor de resultados
             resultadosDiv.appendChild(cardsContainer);
 
         } catch (err) {
