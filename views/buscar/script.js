@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         const token = document.getElementById("token")?.value.trim();
-        const urlApi = document.getElementById("url_api")?.value.trim();
+        const urlApiBase = document.getElementById("url_api")?.value.trim(); // Base URL de la API
         const dato = document.getElementById("dato")?.value.trim();
 
-        if (!token || !urlApi || !dato) {
+        if (!token || !urlApiBase || !dato) {
             Swal.fire({
                 icon: "warning",
                 title: "Campos vacíos",
@@ -22,34 +22,20 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Actualiza el URL de la API con el término de búsqueda
+        const urlApi = `${urlApiBase}?token=${token}&dato=${dato}`; // Asumimos que el URL API espera esos parámetros
+
         try {
-            let allResults = []; // Aquí guardaremos todos los resultados únicos
-            for (let page = 1; page <= 8; page++) { // Recorremos las 8 páginas
-                const url = `${urlApi}?page=${page}&limit=20&search=${dato}`;
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token, dato })
-                });
+            const response = await fetch(urlApi, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, dato })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
+            resultadosDiv.innerHTML = "";
 
-                // Si no se encuentran resultados, salimos del ciclo
-                if (data.status !== "success" || !data.data || data.data.length === 0) {
-                    break;
-                }
-
-                // Agregar los resultados de esta página a la lista total, asegurándonos de no duplicar
-                data.data.forEach(item => {
-                    if (!allResults.some(existingItem => existingItem.nombre === item.nombre)) {
-                        allResults.push(item);
-                    }
-                });
-            }
-
-            // Aseguramos que los resultados se muestren al contenedor
-            resultadosDiv.innerHTML = ""; // Limpiamos el contenedor para mostrar los nuevos resultados
-            if (allResults.length === 0) {
+            if (data.status !== "success" || !data.data || data.data.length === 0) {
                 resultadosDiv.innerHTML = `<div class="alert alert-warning text-center mt-4">
                     ⚠️ No se encontraron resultados para <b>${dato}</b>.
                 </div>`;
@@ -63,13 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
             cardsContainer.style.gap = "20px";
 
             // Centrar cuando hay pocas tarjetas
-            if (allResults.length <= 2) {
+            if (data.data.length <= 2) {
                 cardsContainer.style.justifyContent = "center";
             } else {
                 cardsContainer.style.justifyContent = "flex-start";
             }
 
-            allResults.forEach(item => {
+            data.data.forEach(item => {
                 const cardWrapper = document.createElement("div");
                 cardWrapper.className = "card-wrapper";
 
@@ -88,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 cardsContainer.appendChild(cardWrapper);
             });
 
-            // Finalmente, agregamos todos los resultados al contenedor de resultados
             resultadosDiv.appendChild(cardsContainer);
 
         } catch (err) {
