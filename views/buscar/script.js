@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const urlApi = document.getElementById("url_api")?.value.trim();
         const dato = document.getElementById("dato")?.value.trim();
 
+        // Verificar que se haya ingresado un dato de búsqueda
         if (!token || !urlApi || !dato) {
             Swal.fire({
                 icon: "warning",
@@ -56,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cardsContainer.style.justifyContent = "flex-start";
             }
 
+            // Recorrer los resultados y agregar las tarjetas
             data.data.forEach(item => {
                 const cardWrapper = document.createElement("div");
                 cardWrapper.className = "card-wrapper";
