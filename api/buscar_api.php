@@ -113,6 +113,10 @@ function obtenerDistritos() {
     return $distritos;
 }
 
+
+
+
+
 // Función para realizar la solicitud con cURL
 function obtenerPaginaConCurl($url) {
     $ch = curl_init();
