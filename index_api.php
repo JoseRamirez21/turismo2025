@@ -56,9 +56,9 @@ require_once __DIR__ . '/config/config.php';
             <form id="formBusqueda">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-6">
-    <input type="hidden" id="token" name="token" class="form-control"
-           value="3d9745d326c616598a440eca7cd5e6e5-1" required>
-</div>
+                        <input type="hidden" id="token" name="token" class="form-control"
+                               value="3d9745d326c616598a440eca7cd5e6e5-1" required>
+                    </div>
                     <div class="col-md-6">
                         <label for="dato" class="form-label fw-semibold">Término de búsqueda</label>
                         <input type="text" id="dato" name="dato" class="form-control" 
@@ -66,6 +66,7 @@ require_once __DIR__ . '/config/config.php';
                     </div>
                 </div>
                 <input type="hidden" id="url_api" value="<?php echo BASE_URL; ?>/api/buscar_api.php">
+
                 <div class="mt-3 text-center">
                     <button type="submit" class="btn btn-primary w-50 shadow-sm">🔍 Buscar</button>
                 </div>
@@ -77,10 +78,10 @@ require_once __DIR__ . '/config/config.php';
     <div id="resultados"></div>
 </div>
 
-
+<!-- Cargar baseUrl para el script.js -->
+<script>var baseUrl = "<?php echo BASE_URL; ?>";  // Definir la URL base en JavaScript</script>
 <!-- Cargar script.js con versión dinámica para evitar caché -->
 <script src="<?php echo BASE_URL; ?>/views/buscar/script.js?v=<?php echo time(); ?>"></script>
-
 
 </body>
 </html>

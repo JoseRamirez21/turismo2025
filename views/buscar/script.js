@@ -1,18 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formBusqueda");
     const resultadosDiv = document.getElementById("resultados");
-    const imagenPrueba = "https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg";
+    const imagenPrueba = "https://i.pinimg.com/1200x/7f/c3/68/7fc368451428d898438268d36383d154.jpg"; // imagen de prueba
 
+    // Verificar que el formulario y la división de resultados existen
     if (!form || !resultadosDiv) return;
 
+    // Evento del formulario al hacer submit
     form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevenir el envío normal del formulario
 
+        // Tomar los valores del token y dato del formulario
         const token = document.getElementById("token")?.value.trim();
-        const urlApi = document.getElementById("url_api")?.value.trim();
         const dato = document.getElementById("dato")?.value.trim();
 
-        if (!token || !urlApi || !dato) {
+        if (!token || !dato) {
             Swal.fire({
                 icon: "warning",
                 title: "Campos vacíos",
@@ -22,39 +24,31 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Cambiar la URL sin recargar
-        const newUrl = `${window.location.pathname}?token=${encodeURIComponent(token)}&dato=${encodeURIComponent(dato)}`;
-        window.history.pushState({ path: newUrl }, "", newUrl);
-
         try {
-            const response = await fetch(urlApi, {
+            // Hacer la solicitud a la API con los datos del formulario
+            const response = await fetch(`${baseUrl}/api/buscar_api.php`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, dato })
+                body: JSON.stringify({ token, dato }) // Enviar los datos como JSON
             });
 
-            const data = await response.json();
+            const data = await response.json(); // Parsear la respuesta como JSON
+
+            // Limpiar el contenedor de resultados
             resultadosDiv.innerHTML = "";
 
-            // 🔴 Detectar token inválido o inactivo (maneja acentos y emojis)
+            // Verificar errores en la respuesta
             if (data.status === "error" && data.message) {
-                const cleanMessage = data.message
-                    .normalize("NFD") // elimina acentos
-                    .replace(/[\u0300-\u036f]/g, "") // quita marcas
-                    .replace(/[^\w\s]/gi, "") // elimina emojis o signos
-                    .toLowerCase();
-
-                if (cleanMessage.includes("token invalido") || cleanMessage.includes("token inactivo")) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Token inactivo o inválido",
-                        text: "Tu token está inactivo o no es válido. Por favor verifica o solicita uno nuevo.",
-                        confirmButtonColor: "#d33"
-                    });
-                    return;
-                }
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message,
+                    confirmButtonColor: "#d33"
+                });
+                return;
             }
 
+            // Mostrar los resultados si son exitosos
             if (data.status !== "success" || !data.data || data.data.length === 0) {
                 resultadosDiv.innerHTML = `<div class="alert alert-warning text-center mt-4">
                     ⚠️ No se encontraron resultados para <b>${dato}</b>.
@@ -62,17 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Contenedor de tarjetas
+            // Crear las tarjetas con los resultados
             const cardsContainer = document.createElement("div");
             cardsContainer.style.display = "flex";
             cardsContainer.style.flexWrap = "wrap";
             cardsContainer.style.gap = "20px";
-            cardsContainer.style.justifyContent = data.data.length <= 2 ? "center" : "flex-start";
+            cardsContainer.style.justifyContent = "center";
 
             data.data.forEach(item => {
                 const cardWrapper = document.createElement("div");
                 cardWrapper.className = "card-wrapper";
-
                 cardWrapper.innerHTML = `
                     <div class="card shadow-sm h-100">
                         <img src="${imagenPrueba}" class="card-img-top" alt="${item.nombre}">
@@ -88,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cardsContainer.appendChild(cardWrapper);
             });
 
-            resultadosDiv.appendChild(cardsContainer);
+            resultadosDiv.appendChild(cardsContainer); // Agregar las tarjetas al contenedor
 
         } catch (err) {
             console.error(err);
