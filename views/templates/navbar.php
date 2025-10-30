@@ -27,15 +27,7 @@ if (session_status() == PHP_SESSION_NONE) {
         <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/lugares/listar.php">Lugares</a></li>
       </ul>
 
-      <!-- BOTÓN DE PRUEBA DE TOKEN -->
-<ul class="navbar-nav ms-lg-4 align-items-lg-center">
-  <li class="nav-item">
-    <a class="btn btn-primary rounded-pill px-4 py-1 me-3" 
-       href="<?= BASE_URL ?>/views/tokens/validar_token.php">
-       🔐 Probar Token
-    </a>
-  </li>
-</ul>
+   
 
 
       <!-- BOTÓN ADMIN (Separado del menú principal) -->
