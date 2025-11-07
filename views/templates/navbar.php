@@ -18,14 +18,18 @@ if (session_status() == PHP_SESSION_NONE) {
     </button>
 
     <!-- MENÚ -->
-    <div class="collapse navbar-collapse" id="mainNav">
-      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/index.php">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/departamentos/listar.php">Departamentos</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/provincias/listar.php">Provincias</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/distritos/listar.php">Distritos</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/lugares/listar.php">Lugares</a></li>
-      </ul>
+    <<div class="collapse navbar-collapse" id="mainNav">
+  <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/index.php">Inicio</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/departamentos/listar.php">Departamentos</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/provincias/listar.php">Provincias</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/distritos/listar.php">Distritos</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/lugares/listar.php">Lugares</a></li>
+    <!-- ✅ BOTÓN API CORRECTO -->
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/index_api.php">Api</a></li>
+  </ul>
+</div>
+
 
    
 
