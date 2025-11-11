@@ -18,38 +18,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Buscar token en la base de datos
+    // ============================
+    // Validar token en sistema principal
+    // ============================
     $stmt = $pdo->prepare("SELECT * FROM tokens_api WHERE token = :token");
     $stmt->execute(['token' => $token]);
-    $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $tokenPrinc = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Si no se encuentra el token
-    if (!$tokenData) {
+    if (!$tokenPrinc) {
         echo json_encode([
             'status' => 'error',
-            'message' => '❌ Token no válido.'
+            'message' => '❌ Token no válido en el sistema principal.'
         ]);
         exit;
     }
 
-    // Si el token existe pero está inactivo
-    if ($tokenData['estado'] != 1) {
+    if ($tokenPrinc['estado'] != 1) {
         echo json_encode([
             'status' => 'error',
-            'message' => '⚠️ Token inactivo.'
+            'message' => '⚠️ Token inactivo en el sistema principal.'
         ]);
         exit;
     }
 
-    // Token válido y activo → proceder con la búsqueda
-    $controller = new BuscarApiController($pdo);
+    // ============================
+    // Token válido → proceder con la búsqueda
+    // ============================
+    $controller = new BuscarApiController($pdo); // usar la conexión principal
     $controller->buscar();
 
 } else {
-    echo json_encode([  // Si no es POST, retornar un error
+    echo json_encode([
         'status' => 'error',
         'message' => '❌ Método no permitido. Use POST para realizar la búsqueda.'
     ]);
     exit;
 }
-?>
