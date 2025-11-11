@@ -79,6 +79,6 @@ require_once __DIR__ . '/config/config.php';
 </div>
 
 <script>var baseUrl = "<?php echo BASE_URL; ?>";</script>
-<script src="<?php echo BASE_URL; ?>/views/buscar/script.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo BASE_URL; ?>/views/buscar/script1.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

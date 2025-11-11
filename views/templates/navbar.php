@@ -26,7 +26,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/distritos/listar.php">Distritos</a></li>
     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/views/lugares/listar.php">Lugares</a></li>
     <!-- ✅ BOTÓN API CORRECTO -->
-    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/index_api.php">Api</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/index_api1.php">Api</a></li>
   </ul>
 </div>
 
