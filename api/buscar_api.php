@@ -1,4 +1,23 @@
 <?php
+// ======================================
+// CONFIGURACIÓN DE CORS
+// ======================================
+
+// Permitir solicitudes desde tu dominio específico
+header("Access-Control-Allow-Origin: https://tokenapi.404brothers.com.pe");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+// Manejar solicitudes OPTIONS (preflight)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// ======================================
+// INCLUDES Y LÓGICA DEL SISTEMA
+// ======================================
+
 require_once __DIR__ . '/../config/config.php';  // Configuración con PDO
 require_once __DIR__ . '/../models/Lugar_api.php';  // Modelo de búsqueda
 require_once __DIR__ . '/../controllers/BuscarApiController.php'; // Controlador
