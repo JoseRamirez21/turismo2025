@@ -3,10 +3,21 @@
 // CONFIGURACIÓN DE CORS
 // ======================================
 
-// Permitir solicitudes desde tu dominio específico
-header("Access-Control-Allow-Origin: https://tokenapi.404brothers.com.pe");
+// Permitir solicitudes desde tu dominio específico y también desde localhost
+$allowed_origins = [
+    'https://tokenapi.404brothers.com.pe',
+    'http://localhost',
+    'http://127.0.0.1'
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+}
+
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+header("Content-Type: application/json; charset=utf-8");
 
 // Manejar solicitudes OPTIONS (preflight)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -52,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if ($tokenPrinc['estado'] != 1) {
+    if ((int)$tokenPrinc['estado'] !== 1) {
         echo json_encode([
             'status' => 'error',
             'message' => '⚠️ Token inactivo en el sistema principal.'
